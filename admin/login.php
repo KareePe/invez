@@ -41,11 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="robots" content="noindex, nofollow">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#1a1714] min-h-screen flex items-center justify-center px-4">
+<body class="bg-gray-50 min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-sm">
         <div class="text-center mb-8">
             <div class="text-[#c9a96e] font-semibold text-2xl tracking-wider mb-1">INVEZ</div>
-            <div class="text-white/40 text-sm">ระบบจัดการหลังบ้าน</div>
+            <div class="text-gray-400 text-sm">ระบบจัดการหลังบ้าน</div>
         </div>
 
         <div class="bg-white rounded-xl shadow-xl p-8">

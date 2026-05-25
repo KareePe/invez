@@ -10,8 +10,8 @@ function _nav_active(string $group): string {
         'admins'     => ['admins', 'admin-edit', 'admin-delete'],
     ];
     return in_array($_current, $groups[$group] ?? [], true)
-        ? 'bg-[#c9a96e] text-white'
-        : 'text-white/60 hover:bg-white/10 hover:text-white';
+        ? 'bg-[#fdf6e8] text-[#c9a96e] font-medium'
+        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-800';
 }
 ?>
 <!DOCTYPE html>
@@ -26,14 +26,14 @@ function _nav_active(string $group): string {
         .sidebar-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; font-size:14px; transition:all .15s; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-50 text-gray-800">
 <div class="flex min-h-screen">
 
 <!-- Sidebar -->
-<aside class="w-52 bg-[#1a1714] flex flex-col fixed inset-y-0 left-0 z-30 overflow-y-auto">
-    <div class="px-5 py-5 border-b border-white/10 flex-shrink-0">
+<aside class="w-52 bg-white border-r border-gray-200 flex flex-col fixed inset-y-0 left-0 z-30 overflow-y-auto">
+    <div class="px-5 py-5 border-b border-gray-100 flex-shrink-0">
         <div class="text-[#c9a96e] font-semibold text-base tracking-wide">INVEZ</div>
-        <div class="text-white/30 text-xs mt-0.5">Admin Panel</div>
+        <div class="text-gray-400 text-xs mt-0.5">Admin Panel</div>
     </div>
     <nav class="flex-1 px-3 py-3 space-y-0.5">
         <a href="index.php" class="sidebar-link <?= _nav_active('index') ?>">
@@ -53,9 +53,9 @@ function _nav_active(string $group): string {
             ผู้ดูแลระบบ
         </a>
     </nav>
-    <div class="px-3 py-3 border-t border-white/10 flex-shrink-0">
-        <div class="text-white/30 text-xs px-3 mb-1 truncate"><?= htmlspecialchars($_SESSION['admin_name'] ?? '') ?></div>
-        <a href="logout.php" class="sidebar-link text-white/40 hover:text-white hover:bg-white/10">
+    <div class="px-3 py-3 border-t border-gray-100 flex-shrink-0">
+        <div class="text-gray-400 text-xs px-3 mb-1 truncate"><?= htmlspecialchars($_SESSION['admin_name'] ?? '') ?></div>
+        <a href="logout.php" class="sidebar-link text-gray-400 hover:bg-gray-100 hover:text-gray-700">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             ออกจากระบบ
         </a>
