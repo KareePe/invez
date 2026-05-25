@@ -1,0 +1,19 @@
+# Environment
+.env
+
+# Uploaded files (managed outside git)
+assets/images/properties/*/
+!assets/images/properties/.gitkeep
+
+# Admin setup (delete after first use)
+admin/setup.php
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Claude Code
+.claude/

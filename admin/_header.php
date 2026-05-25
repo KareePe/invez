@@ -1,0 +1,79 @@
+<?php
+$_page_title  = $page_title ?? 'Admin';
+$_current     = basename($_SERVER['PHP_SELF'], '.php');
+function _nav_active(string $group): string {
+    global $_current;
+    static $groups = [
+        'index'      => ['index'],
+        'properties' => ['properties', 'property-edit', 'property-delete'],
+        'articles'   => ['articles', 'article-edit', 'article-delete'],
+        'admins'     => ['admins', 'admin-edit', 'admin-delete'],
+    ];
+    return in_array($_current, $groups[$group] ?? [], true)
+        ? 'bg-[#c9a96e] text-white'
+        : 'text-white/60 hover:bg-white/10 hover:text-white';
+}
+?>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($_page_title) ?> — INVEZ Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; font-size:14px; transition:all .15s; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+<div class="flex min-h-screen">
+
+<!-- Sidebar -->
+<aside class="w-52 bg-[#1a1714] flex flex-col fixed inset-y-0 left-0 z-30 overflow-y-auto">
+    <div class="px-5 py-5 border-b border-white/10 flex-shrink-0">
+        <div class="text-[#c9a96e] font-semibold text-base tracking-wide">INVEZ</div>
+        <div class="text-white/30 text-xs mt-0.5">Admin Panel</div>
+    </div>
+    <nav class="flex-1 px-3 py-3 space-y-0.5">
+        <a href="index.php" class="sidebar-link <?= _nav_active('index') ?>">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </a>
+        <a href="properties.php" class="sidebar-link <?= _nav_active('properties') ?>">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            ทรัพย์สิน
+        </a>
+        <a href="articles.php" class="sidebar-link <?= _nav_active('articles') ?>">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            คอนเทนท์
+        </a>
+        <a href="admins.php" class="sidebar-link <?= _nav_active('admins') ?>">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            ผู้ดูแลระบบ
+        </a>
+    </nav>
+    <div class="px-3 py-3 border-t border-white/10 flex-shrink-0">
+        <div class="text-white/30 text-xs px-3 mb-1 truncate"><?= htmlspecialchars($_SESSION['admin_name'] ?? '') ?></div>
+        <a href="logout.php" class="sidebar-link text-white/40 hover:text-white hover:bg-white/10">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            ออกจากระบบ
+        </a>
+    </div>
+</aside>
+
+<!-- Content -->
+<div class="flex-1 ml-52 flex flex-col min-h-screen">
+    <header class="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-20">
+        <h1 class="font-semibold text-gray-800"><?= htmlspecialchars($_page_title) ?></h1>
+    </header>
+    <?php if (!empty($_SESSION['flash'])): ?>
+    <div class="px-6 pt-4">
+        <?php foreach ($_SESSION['flash'] as $type => $msg): ?>
+        <div class="p-3 rounded-lg text-sm mb-2 <?= $type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200' ?>">
+            <?= htmlspecialchars($msg) ?>
+        </div>
+        <?php endforeach; unset($_SESSION['flash']); ?>
+    </div>
+    <?php endif; ?>
+    <main class="flex-1 p-6">

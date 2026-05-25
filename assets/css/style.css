@@ -1,0 +1,67 @@
+body {
+  font-family: "Prompt", sans-serif;
+}
+
+/* ================= PRELOADER ================= */
+.logo {
+  opacity: 0;
+  transform: scale(0.95);
+  animation: logoFade 1.2s ease forwards;
+}
+
+@keyframes logoFade {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.loading-bar {
+  width: 0%;
+  height: 100%;
+  background: #c9a96e;
+  animation: loadingMove 1.5s ease-in-out infinite;
+}
+
+@keyframes loadingMove {
+  0% {
+    width: 0%;
+  }
+
+  50% {
+    width: 100%;
+  }
+
+  100% {
+    width: 0%;
+  }
+}
+
+#preloader.hide {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.6s ease;
+}
+
+/* ================= ANIMATION ================= */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1s ease;
+}
+
+.fade-up.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================= PARALLAX ================= */
+.parallax {
+  background-attachment: fixed;
+}
+
+/* icon size */
+svg {
+  width: 18px;
+  height: 18px;
+}
