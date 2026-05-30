@@ -24,7 +24,7 @@ foreach ($rows as $row) {
     <meta property="og:description" content="บทความความรู้อสังหาริมทรัพย์ครบทุกประเภท จากทีมผู้เชี่ยวชาญ INVEZ" />
     <meta property="og:url" content="https://www.invez.biz/content" />
     <meta property="og:site_name" content="INVEZ" />
-    <meta name="theme-color" content="#fafaf8" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,80 +33,60 @@ foreach ($rows as $row) {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
-<body class="bg-[#fafaf8] text-[#1a1714]">
+<body class="bg-white text-[#1a1714]">
 
     <!-- Preloader -->
-    <div id="preloader" class="fixed inset-0 bg-[#fafaf8] z-50 flex items-center justify-center">
+    <div id="preloader" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
         <div class="text-center">
-            <img src="assets/images/logo-b.png" class="w-[140px] logo mb-5" alt="INVEZ">
-            <div class="w-28 h-[2px] bg-[#e5d9c8] overflow-hidden mx-auto">
-                <div class="loading-bar"></div>
-            </div>
+            <img src="assets/images/logo-b.png" class="w-[120px] logo" alt="INVEZ">
         </div>
     </div>
 
     <?php include('components/navbar.php'); ?>
 
     <!-- Hero -->
-    <section class="pt-16 bg-[#fafaf8]">
-        <div class="relative overflow-hidden">
-            <div class="absolute inset-0" style="background: radial-gradient(ellipse at 70% 100%, rgba(201,169,110,0.12) 0%, transparent 60%);"></div>
-            <div class="max-w-6xl mx-auto px-6 py-20 md:py-28 relative z-10">
-                <div class="fade-up max-w-2xl">
-                    <p class="text-[#c9a96e] text-xs font-medium tracking-[0.25em] uppercase mb-4">KNOWLEDGE BASE</p>
-                    <h1 class="text-4xl md:text-5xl font-semibold text-[#1a1714] leading-tight mb-5">
-                        คอนเทนท์<br>
-                        <span class="text-[#c9a96e]">ความรู้อสังหาฯ</span>
-                    </h1>
-                    <div class="w-14 h-[2px] bg-[#c9a96e] mb-5"></div>
-                    <p class="text-[#6b5f52] text-base leading-8">
-                        บทความความรู้อสังหาริมทรัพย์ทุกประเภท <?= count($articles) ?> บทความ จากทีมผู้เชี่ยวชาญ INVEZ
-                    </p>
-                </div>
+    <section class="pt-14 bg-white border-b border-[#e8e4df]">
+        <div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
+            <div class="fade-up max-w-xl">
+                <h1 class="text-2xl md:text-3xl font-semibold text-[#1a1714] leading-snug mb-3">
+                    คอนเทนท์ความรู้อสังหาฯ
+                </h1>
+                <p class="text-[#6b5f52] text-sm leading-6">
+                    <?= count($articles) ?> บทความ จากทีมผู้เชี่ยวชาญ INVEZ
+                </p>
             </div>
         </div>
-        <div class="h-[3px] bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent opacity-40"></div>
     </section>
 
     <!-- Articles Grid -->
-    <section class="py-16 md:py-20 px-6 bg-white">
+    <section class="py-12 md:py-16 px-6 bg-white">
         <div class="max-w-6xl mx-auto">
 
-            <div class="mb-10">
-                <p class="text-[#9d8f82] text-sm">
-                    ทั้งหมด <span class="text-[#c9a96e] font-semibold"><?= count($articles) ?> บทความ</span>
-                    ครอบคลุมทุกประเภทอสังหาริมทรัพย์
-                </p>
-            </div>
-
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <?php foreach ($articles as $id => $article): ?>
                 <a href="/article/<?= $id ?>"
-                    class="fade-up bg-white rounded-xl border border-[#e5d9c8] hover:border-[#c9a96e] hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden group">
+                    class="bg-white rounded-lg border border-[#e8e4df] hover:border-[#c9a96e] transition-colors duration-150 flex flex-col overflow-hidden group">
 
-                    <div class="p-6 flex-1 flex flex-col">
-                        <div class="flex items-start justify-between mb-5">
-                            <div class="w-10 h-10 rounded-lg bg-[#fdf6e8] flex items-center justify-center flex-shrink-0 group-hover:bg-[#c9a96e]/15 transition-colors">
-                                <i data-feather="<?= htmlspecialchars($article['icon']) ?>" style="width:17px;height:17px;color:#c9a96e;"></i>
-                            </div>
-                            <span class="text-[10px] font-medium tracking-wider uppercase text-[#c9a96e] bg-[#fdf6e8] px-2.5 py-1 rounded-full border border-[#e5d9c8]">
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-feather="<?= htmlspecialchars($article['icon']) ?>" style="width:15px;height:15px;color:#c9a96e;"></i>
+                            <span class="text-[10px] text-[#9d8f82]">
                                 <?= htmlspecialchars($article['category']) ?>
                             </span>
                         </div>
 
-                        <h2 class="font-semibold text-[#1a1714] text-sm leading-6 mb-3 flex-1">
+                        <h2 class="font-medium text-[#1a1714] text-sm leading-6 mb-2 flex-1">
                             <?= htmlspecialchars($article['title']) ?>
                         </h2>
 
-                        <p class="text-[#9d8f82] text-sm leading-6 line-clamp-2">
+                        <p class="text-[#9d8f82] text-xs leading-5 line-clamp-2">
                             <?= htmlspecialchars($article['excerpt']) ?>
                         </p>
                     </div>
 
-                    <div class="px-6 pb-5 border-t border-[#f0e8d8] pt-4">
-                        <span class="text-[#c9a96e] text-xs font-medium group-hover:text-[#b8965e] transition-colors duration-200 flex items-center gap-1.5">
-                            อ่านบทความ
-                            <i data-feather="arrow-right" style="width:13px;height:13px;"></i>
+                    <div class="px-5 pb-4 pt-3 border-t border-[#f0ebe3]">
+                        <span class="text-xs text-[#6b5f52] group-hover:text-[#c9a96e] transition-colors duration-150">
+                            อ่านบทความ →
                         </span>
                     </div>
 
@@ -117,15 +97,14 @@ foreach ($rows as $row) {
     </section>
 
     <!-- CTA -->
-    <section class="py-20 px-6 bg-[#c9a96e]">
-        <div class="max-w-2xl mx-auto text-center fade-up">
-            <h2 class="text-2xl md:text-3xl font-semibold text-white mb-4">สนใจทรัพย์สินประเภทไหน?</h2>
-            <p class="text-white/80 text-sm md:text-base leading-7 mb-8">
+    <section class="py-14 px-6 bg-[#1a1714]">
+        <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-xl font-semibold text-white mb-3">สนใจทรัพย์สินประเภทไหน?</h2>
+            <p class="text-[#9d8f82] text-sm leading-6 mb-6">
                 ทีมงาน INVEZ พร้อมให้คำปรึกษาและหาทรัพย์สินที่ตรงโจทย์ให้คุณ
             </p>
             <a href="/contact"
-                class="inline-flex items-center gap-2 bg-white text-[#c9a96e] px-8 py-3 rounded font-semibold hover:bg-[#fdf6e8] transition-colors duration-200 text-sm">
-                <i data-feather="message-circle" style="width:16px;height:16px;"></i>
+                class="inline-flex items-center gap-2 bg-[#c9a96e] text-white px-6 py-2.5 rounded text-sm font-medium hover:bg-[#b8965e] transition-colors duration-150">
                 ปรึกษาผู้เชี่ยวชาญ
             </a>
         </div>
@@ -138,11 +117,11 @@ foreach ($rows as $row) {
         feather.replace();
         const observer = new IntersectionObserver(
             (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); }),
-            { threshold: 0.08 }
+            { threshold: 0.05 }
         );
         document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
         window.addEventListener('load', () => {
-            setTimeout(() => document.getElementById('preloader').classList.add('hide'), 600);
+            setTimeout(() => document.getElementById('preloader').classList.add('hide'), 400);
         });
     </script>
 </body>

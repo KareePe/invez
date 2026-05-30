@@ -48,7 +48,7 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <meta property="og:image" content="https://www.invez.biz/<?= htmlspecialchars($cover) ?>" />
     <?php endif; ?>
     <meta property="og:site_name" content="INVEZ" />
-    <meta name="theme-color" content="#fafaf8" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <?php
     $_base = rtrim(str_replace('\\', '/', str_replace(realpath($_SERVER['DOCUMENT_ROOT']), '', realpath(__DIR__))), '/') . '/';
@@ -61,175 +61,136 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
-<body class="bg-[#fafaf8] text-[#1a1714]">
+<body class="bg-white text-[#1a1714]">
 
     <!-- Preloader -->
-    <div id="preloader" class="fixed inset-0 bg-[#fafaf8] z-50 flex items-center justify-center">
+    <div id="preloader" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
         <div class="text-center">
-            <img src="assets/images/logo-b.png" class="w-[120px] logo mb-4" alt="INVEZ">
-            <div class="w-24 h-[2px] bg-[#e5d9c8] overflow-hidden mx-auto">
-                <div class="loading-bar"></div>
-            </div>
+            <img src="assets/images/logo-b.png" class="w-[100px] logo" alt="INVEZ">
         </div>
     </div>
 
     <?php include('components/navbar.php'); ?>
 
     <!-- Hero -->
-    <section class="pt-16 bg-[#fafaf8]">
-        <div class="relative overflow-hidden">
-            <div class="absolute inset-0" style="background: radial-gradient(ellipse at 70% 100%, rgba(201,169,110,0.1) 0%, transparent 55%);"></div>
-            <div class="max-w-4xl mx-auto px-6 py-16 md:py-24 relative z-10">
+    <section class="pt-14 bg-white border-b border-[#e8e4df]">
+        <div class="max-w-4xl mx-auto px-6 py-10 md:py-14">
 
-                <!-- Breadcrumb -->
-                <nav class="flex items-center gap-2 text-xs text-[#9d8f82] mb-8 fade-up" aria-label="breadcrumb">
-                    <a href="/properties" class="hover:text-[#c9a96e] transition-colors">ทรัพย์สิน</a>
-                    <i data-feather="chevron-right" style="width:13px;height:13px;"></i>
-                    <a href="/properties?cat=<?= htmlspecialchars($p['category']) ?>" class="hover:text-[#c9a96e] transition-colors">
-                        <?= htmlspecialchars($cat_label) ?>
-                    </a>
-                    <i data-feather="chevron-right" style="width:13px;height:13px;"></i>
-                    <span class="text-[#c9a96e]"><?= htmlspecialchars($p['title']) ?></span>
-                </nav>
+            <!-- Breadcrumb -->
+            <nav class="flex items-center gap-1.5 text-xs text-[#9d8f82] mb-6" aria-label="breadcrumb">
+                <a href="/properties" class="hover:text-[#1a1714] transition-colors">ทรัพย์สิน</a>
+                <span>/</span>
+                <a href="/properties?cat=<?= htmlspecialchars($p['category']) ?>" class="hover:text-[#1a1714] transition-colors">
+                    <?= htmlspecialchars($cat_label) ?>
+                </a>
+                <span>/</span>
+                <span class="text-[#1a1714]"><?= htmlspecialchars($p['title']) ?></span>
+            </nav>
 
-                <div class="fade-up">
-                    <span class="inline-block text-[10px] font-medium tracking-wider uppercase text-[#c9a96e] bg-[#fdf6e8] px-3 py-1.5 rounded-full border border-[#e5d9c8] mb-5">
-                        <?= htmlspecialchars($cat_label) ?>
-                    </span>
-                    <h1 class="text-3xl md:text-4xl font-semibold text-[#1a1714] leading-tight mb-3">
-                        <?= htmlspecialchars($p['title']) ?>
-                    </h1>
-                    <p class="text-[#9d8f82] text-sm mb-4"><?= htmlspecialchars($p['subtitle']) ?></p>
-                    <div class="w-14 h-[2px] bg-[#c9a96e]"></div>
-                </div>
-
+            <div class="fade-up">
+                <span class="inline-block text-xs text-[#c9a96e] mb-3">
+                    <?= htmlspecialchars($cat_label) ?>
+                </span>
+                <h1 class="text-2xl md:text-3xl font-semibold text-[#1a1714] leading-snug mb-2">
+                    <?= htmlspecialchars($p['title']) ?>
+                </h1>
+                <?php if (!empty($p['subtitle'])): ?>
+                <p class="text-[#6b5f52] text-sm"><?= htmlspecialchars($p['subtitle']) ?></p>
+                <?php endif; ?>
             </div>
+
         </div>
-        <div class="h-[3px] bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent opacity-40"></div>
     </section>
 
     <!-- Main Content -->
-    <section class="py-12 md:py-16 px-6 bg-white">
+    <section class="py-10 md:py-14 px-6 bg-white">
         <div class="max-w-4xl mx-auto">
 
             <!-- Cover image -->
             <?php if ($cover): ?>
-            <div class="fade-up mb-10 rounded-xl overflow-hidden border border-[#e5d9c8]">
+            <div class="mb-8 rounded-lg overflow-hidden border border-[#e8e4df]">
                 <img src="<?= htmlspecialchars($cover) ?>"
                      alt="<?= htmlspecialchars($p['title']) ?>"
-                     class="w-full max-h-[480px] object-cover">
+                     class="w-full max-h-[440px] object-cover">
             </div>
             <?php endif; ?>
 
-            <!-- Price + Status bar -->
-            <div class="fade-up flex flex-wrap items-center justify-between gap-4 bg-[#fdf6e8] border border-[#e5d9c8] rounded-xl px-6 py-5 mb-10">
+            <!-- Price + Status -->
+            <div class="flex flex-wrap items-center justify-between gap-4 py-5 border-y border-[#e8e4df] mb-8">
                 <div>
-                    <p class="text-xs text-[#9d8f82] mb-1">ราคา</p>
-                    <p class="text-2xl md:text-3xl font-semibold text-[#c9a96e]"><?= htmlspecialchars($p['price_display']) ?></p>
+                    <p class="text-xs text-[#9d8f82] mb-0.5">ราคา</p>
+                    <p class="text-xl md:text-2xl font-semibold text-[#c9a96e]"><?= htmlspecialchars($p['price_display']) ?></p>
                 </div>
+                <?php if (!empty($p['status'])): ?>
                 <div class="text-right">
-                    <p class="text-xs text-[#9d8f82] mb-1">สถานะ</p>
+                    <p class="text-xs text-[#9d8f82] mb-0.5">สถานะ</p>
                     <p class="text-sm font-medium text-[#1a1714]"><?= htmlspecialchars($p['status']) ?></p>
                 </div>
+                <?php endif; ?>
             </div>
 
             <!-- Key stats -->
-            <div class="fade-up grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
-                <?php if (!empty($p['land_area'])): ?>
-                <div class="bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-4 text-center">
-                    <i data-feather="maximize-2" style="width:18px;height:18px;color:#c9a96e;" class="mx-auto mb-2"></i>
-                    <p class="text-xs text-[#9d8f82] mb-0.5">ที่ดิน</p>
-                    <p class="text-sm font-semibold text-[#1a1714]"><?= htmlspecialchars($p['land_area']) ?></p>
+            <?php
+            $stats = [];
+            if (!empty($p['land_area']))   $stats[] = ['ที่ดิน', htmlspecialchars($p['land_area'])];
+            if (!empty($p['usable_area'])) $stats[] = ['พื้นที่ใช้สอย', htmlspecialchars($p['usable_area'])];
+            if (!empty($p['floors']))      $stats[] = ['จำนวนชั้น', htmlspecialchars($p['floors'])];
+            if (!empty($p['beds']))        $stats[] = [$p['category'] === 'hospital' ? 'เตียง' : 'ห้องนอน', $p['beds'].' '.($p['category'] === 'hospital' ? 'เตียง' : 'ห้อง')];
+            if (!empty($p['bathrooms']))   $stats[] = ['ห้องน้ำ', $p['bathrooms'].' ห้อง'];
+            if (!empty($p['parking']))     $stats[] = ['จอดรถ', htmlspecialchars($p['parking'])];
+            if (!empty($p['offices']))     $stats[] = ['ห้องสำนักงาน', $p['offices'].' ห้อง'];
+            if (!empty($p['location_short'])) $stats[] = ['ที่ตั้ง', htmlspecialchars($p['location_short'])];
+            ?>
+            <?php if (!empty($stats)): ?>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[#e8e4df] border border-[#e8e4df] rounded-lg overflow-hidden mb-8">
+                <?php foreach ($stats as $s): ?>
+                <div class="bg-white px-4 py-3">
+                    <p class="text-xs text-[#9d8f82] mb-0.5"><?= $s[0] ?></p>
+                    <p class="text-sm font-medium text-[#1a1714]"><?= $s[1] ?></p>
                 </div>
-                <?php endif; ?>
-                <?php if (!empty($p['usable_area'])): ?>
-                <div class="bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-4 text-center">
-                    <i data-feather="grid" style="width:18px;height:18px;color:#c9a96e;" class="mx-auto mb-2"></i>
-                    <p class="text-xs text-[#9d8f82] mb-0.5">พื้นที่ใช้สอย</p>
-                    <p class="text-sm font-semibold text-[#1a1714]"><?= htmlspecialchars($p['usable_area']) ?></p>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($p['floors'])): ?>
-                <div class="bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-4 text-center">
-                    <i data-feather="layers" style="width:18px;height:18px;color:#c9a96e;" class="mx-auto mb-2"></i>
-                    <p class="text-xs text-[#9d8f82] mb-0.5">จำนวนชั้น</p>
-                    <p class="text-sm font-semibold text-[#1a1714]"><?= htmlspecialchars($p['floors']) ?></p>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($p['beds'])): ?>
-                <div class="bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-4 text-center">
-                    <i data-feather="<?= $p['category'] === 'hospital' ? 'activity' : 'moon' ?>" style="width:18px;height:18px;color:#c9a96e;" class="mx-auto mb-2"></i>
-                    <p class="text-xs text-[#9d8f82] mb-0.5"><?= $p['category'] === 'hospital' ? 'เตียง' : 'ห้องนอน' ?></p>
-                    <p class="text-sm font-semibold text-[#1a1714]"><?= $p['beds'] ?> <?= $p['category'] === 'hospital' ? 'เตียง' : 'ห้อง' ?></p>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($p['bathrooms'])): ?>
-                <div class="bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-4 text-center">
-                    <i data-feather="droplet" style="width:18px;height:18px;color:#c9a96e;" class="mx-auto mb-2"></i>
-                    <p class="text-xs text-[#9d8f82] mb-0.5">ห้องน้ำ</p>
-                    <p class="text-sm font-semibold text-[#1a1714]"><?= $p['bathrooms'] ?> ห้อง</p>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($p['parking'])): ?>
-                <div class="bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-4 text-center">
-                    <i data-feather="truck" style="width:18px;height:18px;color:#c9a96e;" class="mx-auto mb-2"></i>
-                    <p class="text-xs text-[#9d8f82] mb-0.5">จอดรถ</p>
-                    <p class="text-sm font-semibold text-[#1a1714]"><?= htmlspecialchars($p['parking']) ?></p>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($p['offices'])): ?>
-                <div class="bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-4 text-center">
-                    <i data-feather="briefcase" style="width:18px;height:18px;color:#c9a96e;" class="mx-auto mb-2"></i>
-                    <p class="text-xs text-[#9d8f82] mb-0.5">ห้องสำนักงาน</p>
-                    <p class="text-sm font-semibold text-[#1a1714]"><?= $p['offices'] ?> ห้อง</p>
-                </div>
-                <?php endif; ?>
-                <div class="bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-4 text-center">
-                    <i data-feather="map-pin" style="width:18px;height:18px;color:#c9a96e;" class="mx-auto mb-2"></i>
-                    <p class="text-xs text-[#9d8f82] mb-0.5">ที่ตั้ง</p>
-                    <p class="text-sm font-semibold text-[#1a1714]"><?= htmlspecialchars($p['location_short']) ?></p>
-                </div>
+                <?php endforeach; ?>
             </div>
-
-            <div class="h-px bg-[#f0e8d8] mb-10"></div>
+            <?php endif; ?>
 
             <!-- Description -->
-            <div class="fade-up mb-10">
-                <h2 class="text-lg font-semibold text-[#1a1714] mb-4">รายละเอียด</h2>
-                <p class="text-[#5a4e42] text-base leading-9"><?= htmlspecialchars($p['description']) ?></p>
-                <p class="text-sm text-[#9d8f82] mt-3 flex items-center gap-1.5">
-                    <i data-feather="map-pin" style="width:13px;height:13px;"></i>
+            <?php if (!empty($p['description'])): ?>
+            <div class="mb-8">
+                <h2 class="text-base font-semibold text-[#1a1714] mb-3">รายละเอียด</h2>
+                <p class="text-[#5a4e42] text-sm leading-7"><?= htmlspecialchars($p['description']) ?></p>
+                <?php if (!empty($p['location'])): ?>
+                <p class="text-xs text-[#9d8f82] mt-3 flex items-center gap-1">
+                    <i data-feather="map-pin" style="width:11px;height:11px;"></i>
                     <?= htmlspecialchars($p['location']) ?>
                 </p>
+                <?php endif; ?>
             </div>
+            <?php endif; ?>
 
             <!-- Highlights -->
             <?php if (!empty($p['highlights'])): ?>
-            <div class="fade-up mb-10">
-                <h2 class="text-lg font-semibold text-[#1a1714] mb-5">จุดเด่น</h2>
-                <div class="space-y-3">
+            <div class="mb-8">
+                <h2 class="text-base font-semibold text-[#1a1714] mb-4">จุดเด่น</h2>
+                <div class="space-y-2">
                     <?php foreach ($p['highlights'] as $i => $h): ?>
-                    <div class="flex gap-4 items-start bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-4 hover:border-[#c9a96e] transition-colors group">
-                        <div class="w-8 h-8 rounded-full bg-[#c9a96e] text-white flex items-center justify-center font-semibold text-sm flex-shrink-0 group-hover:bg-[#b8965e] transition-colors">
-                            <?= $i + 1 ?>
-                        </div>
-                        <p class="text-[#5a4e42] text-sm leading-7 pt-0.5"><?= htmlspecialchars($h) ?></p>
+                    <div class="flex gap-3 items-start py-3 border-b border-[#f0ebe3] last:border-0">
+                        <span class="w-5 h-5 rounded-full bg-[#c9a96e] text-white flex items-center justify-center text-[10px] font-semibold flex-shrink-0 mt-0.5"><?= $i + 1 ?></span>
+                        <p class="text-[#5a4e42] text-sm leading-6"><?= htmlspecialchars($h) ?></p>
                     </div>
                     <?php endforeach; ?>
                 </div>
             </div>
             <?php endif; ?>
 
-            <!-- Additional images gallery -->
+            <!-- Gallery -->
             <?php if (count($p['images']) > 1): ?>
-            <div class="fade-up mb-10">
-                <h2 class="text-lg font-semibold text-[#1a1714] mb-5">รูปภาพทั้งหมด</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="mb-8">
+                <h2 class="text-base font-semibold text-[#1a1714] mb-4">รูปภาพทั้งหมด</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     <?php foreach ($p['images'] as $img): ?>
-                    <div class="rounded-xl overflow-hidden border border-[#e5d9c8] aspect-[4/3]">
+                    <div class="rounded-lg overflow-hidden border border-[#e8e4df] aspect-[4/3]">
                         <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
                              alt="<?= htmlspecialchars($p['title']) ?>"
-                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                             class="w-full h-full object-cover">
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -239,29 +200,28 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
         </div>
     </section>
 
-    <!-- Back to listing -->
-    <section class="py-8 px-6 bg-[#fafaf8] border-t border-[#e5d9c8]">
-        <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+    <!-- Back nav -->
+    <section class="py-6 px-6 bg-[#fafaf8] border-t border-[#e8e4df]">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
             <a href="/properties?cat=<?= htmlspecialchars($p['category']) ?>"
-               class="flex items-center gap-2 text-[#6b5f52] hover:text-[#c9a96e] transition-colors text-sm">
-                <i data-feather="arrow-left" style="width:15px;height:15px;"></i>
+               class="flex items-center gap-1.5 text-[#6b5f52] hover:text-[#1a1714] transition-colors text-sm">
+                <i data-feather="arrow-left" style="width:14px;height:14px;"></i>
                 <?= htmlspecialchars($cat_label) ?>ทั้งหมด
             </a>
             <a href="/properties"
-               class="text-xs border border-[#e5d9c8] hover:border-[#c9a96e] hover:text-[#c9a96e] text-[#9d8f82] px-4 py-2 rounded-full transition-colors">
+               class="text-xs text-[#9d8f82] hover:text-[#1a1714] transition-colors">
                 ดูทั้งหมด
             </a>
         </div>
     </section>
 
     <!-- CTA -->
-    <section class="py-16 px-6 bg-[#c9a96e]">
-        <div class="max-w-2xl mx-auto text-center fade-up">
-            <h2 class="text-xl md:text-2xl font-semibold text-white mb-3">สนใจทรัพย์สินนี้?</h2>
-            <p class="text-white/80 text-sm leading-7 mb-6">ทีมงาน INVEZ พร้อมให้ข้อมูลและเจรจาดีลที่ตรงโจทย์ให้คุณ</p>
+    <section class="py-14 px-6 bg-[#1a1714]">
+        <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-lg font-semibold text-white mb-2">สนใจทรัพย์สินนี้?</h2>
+            <p class="text-[#9d8f82] text-sm leading-6 mb-6">ทีมงาน INVEZ พร้อมให้ข้อมูลและเจรจาดีลที่ตรงโจทย์ให้คุณ</p>
             <a href="/contact"
-               class="inline-flex items-center gap-2 bg-white text-[#c9a96e] px-7 py-3 rounded font-semibold hover:bg-[#fdf6e8] transition-colors duration-200 text-sm">
-                <i data-feather="phone" style="width:15px;height:15px;"></i>
+               class="inline-flex items-center gap-2 bg-[#c9a96e] text-white px-6 py-2.5 rounded text-sm font-medium hover:bg-[#b8965e] transition-colors duration-150">
                 ติดต่อเรา
             </a>
         </div>
@@ -274,11 +234,11 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
         feather.replace();
         const observer = new IntersectionObserver(
             (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); }),
-            { threshold: 0.1 }
+            { threshold: 0.05 }
         );
         document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
         window.addEventListener('load', () => {
-            setTimeout(() => document.getElementById('preloader').classList.add('hide'), 500);
+            setTimeout(() => document.getElementById('preloader').classList.add('hide'), 400);
         });
     </script>
 </body>

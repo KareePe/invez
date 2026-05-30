@@ -47,7 +47,7 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
     <meta property="og:description" content="<?= $meta_desc ?>" />
     <meta property="og:url" content="https://www.invez.biz/article/<?= $id ?>" />
     <meta property="og:site_name" content="INVEZ" />
-    <meta name="theme-color" content="#fafaf8" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <?php
     $_base = rtrim(str_replace('\\', '/', str_replace(realpath($_SERVER['DOCUMENT_ROOT']), '', realpath(__DIR__))), '/') . '/';
@@ -60,100 +60,83 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
-<body class="bg-[#fafaf8] text-[#1a1714]">
+<body class="bg-white text-[#1a1714]">
 
     <!-- Preloader -->
-    <div id="preloader" class="fixed inset-0 bg-[#fafaf8] z-50 flex items-center justify-center">
+    <div id="preloader" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
         <div class="text-center">
-            <img src="assets/images/logo-b.png" class="w-[120px] logo mb-4" alt="INVEZ">
-            <div class="w-24 h-[2px] bg-[#e5d9c8] overflow-hidden mx-auto">
-                <div class="loading-bar"></div>
-            </div>
+            <img src="assets/images/logo-b.png" class="w-[100px] logo" alt="INVEZ">
         </div>
     </div>
 
     <?php include('components/navbar.php'); ?>
 
     <!-- Hero -->
-    <section class="pt-16 bg-[#fafaf8]">
-        <div class="relative overflow-hidden">
-            <div class="absolute inset-0" style="background: radial-gradient(ellipse at 70% 100%, rgba(201,169,110,0.1) 0%, transparent 55%);"></div>
-            <div class="max-w-4xl mx-auto px-6 py-16 md:py-24 relative z-10">
+    <section class="pt-14 bg-white border-b border-[#e8e4df]">
+        <div class="max-w-3xl mx-auto px-6 py-10 md:py-14">
 
-                <!-- Breadcrumb -->
-                <nav class="flex items-center gap-2 text-xs text-[#9d8f82] mb-8 fade-up" aria-label="breadcrumb">
-                    <a href="/content" class="hover:text-[#c9a96e] transition-colors">คอนเทนท์</a>
-                    <i data-feather="chevron-right" style="width:13px;height:13px;"></i>
-                    <span class="text-[#c9a96e]"><?= htmlspecialchars($article['category']) ?></span>
-                </nav>
+            <!-- Breadcrumb -->
+            <nav class="flex items-center gap-1.5 text-xs text-[#9d8f82] mb-6" aria-label="breadcrumb">
+                <a href="/content" class="hover:text-[#1a1714] transition-colors">คอนเทนท์</a>
+                <span>/</span>
+                <span class="text-[#1a1714]"><?= htmlspecialchars($article['category']) ?></span>
+            </nav>
 
-                <div class="fade-up">
-                    <span class="inline-block text-[10px] font-medium tracking-wider uppercase text-[#c9a96e] bg-[#fdf6e8] px-3 py-1.5 rounded-full border border-[#e5d9c8] mb-5">
-                        <?= htmlspecialchars($article['category']) ?>
-                    </span>
-                    <h1 class="text-3xl md:text-4xl font-semibold text-[#1a1714] leading-tight mb-5">
-                        <?= htmlspecialchars($article['title']) ?>
-                    </h1>
-                    <div class="w-14 h-[2px] bg-[#c9a96e]"></div>
-                </div>
-
+            <div class="fade-up">
+                <h1 class="text-2xl md:text-3xl font-semibold text-[#1a1714] leading-snug mb-3">
+                    <?= htmlspecialchars($article['title']) ?>
+                </h1>
+                <?php if (!empty($article['excerpt'])): ?>
+                <p class="text-[#6b5f52] text-sm leading-6"><?= htmlspecialchars($article['excerpt']) ?></p>
+                <?php endif; ?>
             </div>
+
         </div>
-        <div class="h-[3px] bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent opacity-40"></div>
     </section>
 
     <!-- Article Body -->
-    <section class="py-16 md:py-20 px-6 bg-white">
-        <div class="max-w-4xl mx-auto">
+    <section class="py-10 md:py-14 px-6 bg-white">
+        <div class="max-w-3xl mx-auto">
 
             <!-- Intro -->
-            <div class="fade-up mb-12">
-                <div class="flex gap-4 items-start">
-                    <div class="w-12 h-12 rounded-xl bg-[#fdf6e8] border border-[#e5d9c8] flex items-center justify-center flex-shrink-0">
-                        <i data-feather="<?= htmlspecialchars($article['icon']) ?>" style="width:20px;height:20px;color:#c9a96e;"></i>
-                    </div>
-                    <p class="text-[#5a4e42] text-base md:text-lg leading-9 pt-1">
-                        <?= htmlspecialchars($article['intro']) ?>
-                    </p>
-                </div>
+            <?php if (!empty($article['intro'])): ?>
+            <div class="mb-10 pb-10 border-b border-[#e8e4df]">
+                <p class="text-[#5a4e42] text-base leading-8">
+                    <?= htmlspecialchars($article['intro']) ?>
+                </p>
             </div>
-
-            <!-- Divider -->
-            <div class="h-px bg-[#f0e8d8] mb-12"></div>
+            <?php endif; ?>
 
             <!-- Key Points -->
-            <div class="space-y-6">
+            <?php if (!empty($article['points'])): ?>
+            <div class="space-y-4">
                 <?php foreach ($article['points'] as $i => $point): ?>
-                <div class="fade-up bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-6 md:p-7 flex gap-5 items-start hover:border-[#c9a96e] transition-colors duration-300 group">
-
-                    <div class="w-9 h-9 rounded-full bg-[#c9a96e] text-white flex items-center justify-center font-semibold text-sm flex-shrink-0 mt-0.5 group-hover:bg-[#b8965e] transition-colors">
-                        <?= $i + 1 ?>
-                    </div>
-
+                <div class="flex gap-4 items-start py-5 border-b border-[#f0ebe3] last:border-0">
+                    <span class="w-6 h-6 rounded-full bg-[#c9a96e] text-white flex items-center justify-center text-[11px] font-semibold flex-shrink-0 mt-0.5"><?= $i + 1 ?></span>
                     <div class="flex-1 min-w-0">
-                        <h2 class="font-semibold text-[#1a1714] mb-2 text-base">
+                        <h2 class="font-medium text-[#1a1714] mb-1.5 text-sm">
                             <?= htmlspecialchars($point['label']) ?>
                         </h2>
-                        <p class="text-[#6b5f52] leading-7 text-sm md:text-base">
+                        <p class="text-[#6b5f52] leading-7 text-sm">
                             <?= htmlspecialchars($point['detail']) ?>
                         </p>
                     </div>
-
                 </div>
                 <?php endforeach; ?>
             </div>
+            <?php endif; ?>
 
         </div>
     </section>
 
     <!-- Prev / Next Navigation -->
-    <section class="py-10 px-6 bg-[#fafaf8] border-t border-[#e5d9c8]">
-        <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+    <section class="py-6 px-6 bg-[#fafaf8] border-t border-[#e8e4df]">
+        <div class="max-w-3xl mx-auto flex items-center justify-between gap-4">
 
             <?php if ($prev): ?>
             <a href="/article/<?= $prev['id'] ?>"
-                class="flex items-center gap-2 text-[#6b5f52] hover:text-[#c9a96e] transition-colors duration-200 text-sm group max-w-[45%]">
-                <i data-feather="arrow-left" style="width:16px;height:16px;" class="flex-shrink-0"></i>
+                class="flex items-center gap-1.5 text-[#6b5f52] hover:text-[#1a1714] transition-colors duration-150 text-sm max-w-[45%]">
+                <i data-feather="arrow-left" style="width:14px;height:14px;" class="flex-shrink-0"></i>
                 <span class="line-clamp-1"><?= htmlspecialchars($prev['category']) ?></span>
             </a>
             <?php else: ?>
@@ -161,15 +144,15 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
             <?php endif; ?>
 
             <a href="/content"
-                class="flex-shrink-0 text-[#9d8f82] hover:text-[#c9a96e] transition-colors duration-200 text-xs border border-[#e5d9c8] hover:border-[#c9a96e] px-4 py-2 rounded-full">
+                class="flex-shrink-0 text-xs text-[#9d8f82] hover:text-[#1a1714] transition-colors duration-150 border border-[#e8e4df] hover:border-[#1a1714] px-4 py-1.5 rounded">
                 ดูทั้งหมด
             </a>
 
             <?php if ($next): ?>
             <a href="/article/<?= $next['id'] ?>"
-                class="flex items-center gap-2 text-[#6b5f52] hover:text-[#c9a96e] transition-colors duration-200 text-sm group max-w-[45%] justify-end text-right">
+                class="flex items-center gap-1.5 text-[#6b5f52] hover:text-[#1a1714] transition-colors duration-150 text-sm max-w-[45%] justify-end text-right">
                 <span class="line-clamp-1"><?= htmlspecialchars($next['category']) ?></span>
-                <i data-feather="arrow-right" style="width:16px;height:16px;" class="flex-shrink-0"></i>
+                <i data-feather="arrow-right" style="width:14px;height:14px;" class="flex-shrink-0"></i>
             </a>
             <?php else: ?>
             <div></div>
@@ -179,23 +162,20 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
     </section>
 
     <!-- Related articles -->
-    <section class="py-16 md:py-20 px-6 bg-white border-t border-[#e5d9c8]">
-        <div class="max-w-4xl mx-auto">
-            <p class="text-[#c9a96e] text-xs font-medium tracking-[0.2em] uppercase mb-3">อ่านต่อ</p>
-            <h2 class="text-xl font-semibold text-[#1a1714] mb-8">บทความที่เกี่ยวข้อง</h2>
-            <div class="grid sm:grid-cols-3 gap-4">
+    <section class="py-10 md:py-14 px-6 bg-white border-t border-[#e8e4df]">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-sm font-semibold text-[#1a1714] mb-5">บทความที่เกี่ยวข้อง</h2>
+            <div class="grid sm:grid-cols-3 gap-3">
                 <?php foreach ($related as $r): ?>
                 <a href="/article/<?= $r['id'] ?>"
-                    class="fade-up bg-[#fafaf8] border border-[#e5d9c8] rounded-xl p-5 hover:border-[#c9a96e] hover:shadow-md transition-all duration-300 group flex flex-col">
-                    <div class="flex items-center gap-2 mb-3">
-                        <div class="w-8 h-8 rounded-lg bg-[#fdf6e8] flex items-center justify-center group-hover:bg-[#c9a96e]/15 transition-colors flex-shrink-0">
-                            <i data-feather="<?= htmlspecialchars($r['icon']) ?>" style="width:15px;height:15px;color:#c9a96e;"></i>
-                        </div>
-                        <span class="text-[10px] text-[#c9a96e] font-medium tracking-wider uppercase truncate">
+                    class="border border-[#e8e4df] rounded-lg p-4 hover:border-[#c9a96e] transition-colors duration-150 flex flex-col gap-2">
+                    <div class="flex items-center gap-2">
+                        <i data-feather="<?= htmlspecialchars($r['icon']) ?>" style="width:13px;height:13px;color:#c9a96e;flex-shrink:0;"></i>
+                        <span class="text-[10px] text-[#9d8f82] truncate">
                             <?= htmlspecialchars($r['category']) ?>
                         </span>
                     </div>
-                    <h3 class="text-sm font-medium text-[#1a1714] leading-5 line-clamp-3 flex-1">
+                    <h3 class="text-xs font-medium text-[#1a1714] leading-5 line-clamp-3">
                         <?= htmlspecialchars($r['title']) ?>
                     </h3>
                 </a>
@@ -205,13 +185,12 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
     </section>
 
     <!-- CTA -->
-    <section class="py-16 px-6 bg-[#c9a96e]">
-        <div class="max-w-2xl mx-auto text-center fade-up">
-            <h2 class="text-xl md:text-2xl font-semibold text-white mb-3">สนใจทรัพย์สินประเภทนี้?</h2>
-            <p class="text-white/80 text-sm leading-7 mb-6">ทีมงาน INVEZ พร้อมให้คำปรึกษาและจับคู่ดีลที่ตรงโจทย์ให้คุณ</p>
+    <section class="py-14 px-6 bg-[#1a1714]">
+        <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-lg font-semibold text-white mb-2">สนใจทรัพย์สินประเภทนี้?</h2>
+            <p class="text-[#9d8f82] text-sm leading-6 mb-6">ทีมงาน INVEZ พร้อมให้คำปรึกษาและจับคู่ดีลที่ตรงโจทย์ให้คุณ</p>
             <a href="/contact"
-                class="inline-flex items-center gap-2 bg-white text-[#c9a96e] px-7 py-3 rounded font-semibold hover:bg-[#fdf6e8] transition-colors duration-200 text-sm">
-                <i data-feather="phone" style="width:15px;height:15px;"></i>
+                class="inline-flex items-center gap-2 bg-[#c9a96e] text-white px-6 py-2.5 rounded text-sm font-medium hover:bg-[#b8965e] transition-colors duration-150">
                 ติดต่อเรา
             </a>
         </div>
@@ -224,11 +203,11 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
         feather.replace();
         const observer = new IntersectionObserver(
             (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); }),
-            { threshold: 0.1 }
+            { threshold: 0.05 }
         );
         document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
         window.addEventListener('load', () => {
-            setTimeout(() => document.getElementById('preloader').classList.add('hide'), 500);
+            setTimeout(() => document.getElementById('preloader').classList.add('hide'), 400);
         });
     </script>
 </body>
