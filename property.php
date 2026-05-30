@@ -59,6 +59,21 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <style>
+        #prop-slider { aspect-ratio: 16/9; max-height: 480px; }
+        #prop-slider .swiper-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        #prop-slider .swiper-button-prev,
+        #prop-slider .swiper-button-next { width: 36px; height: 36px; background: rgba(0,0,0,.4); border-radius: 50%; color: #fff; --swiper-navigation-size: 16px; transition: background .15s; }
+        #prop-slider .swiper-button-prev:hover,
+        #prop-slider .swiper-button-next:hover { background: rgba(0,0,0,.6); }
+        #prop-slider .swiper-button-prev::after,
+        #prop-slider .swiper-button-next::after { font-size: 16px; font-weight: 700; }
+        #prop-slider .swiper-pagination-fraction { font-size: 11px; color: #fff; background: rgba(0,0,0,.5); padding: 2px 8px; border-radius: 4px; width: auto; right: 12px; left: auto; bottom: 12px; }
+        #prop-thumbs .swiper-slide { width: 64px !important; height: 48px; border-radius: 4px; overflow: hidden; border: 2px solid transparent; cursor: pointer; opacity: .65; transition: opacity .15s, border-color .15s; }
+        #prop-thumbs .swiper-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        #prop-thumbs .swiper-slide-thumb-active { border-color: #c9a96e; opacity: 1; }
+    </style>
 </head>
 
 <body class="bg-white text-[#1a1714]">
@@ -106,32 +121,34 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <section class="py-10 md:py-14 px-6 bg-white">
         <div class="max-w-4xl mx-auto">
 
-            <!-- Image slider -->
+            <!-- Image slider (Swiper) -->
             <?php if (!empty($p['images'])): $img_count = count($p['images']); ?>
             <div class="mb-8">
-                <div class="relative w-full aspect-video max-h-[480px] overflow-hidden rounded-lg border border-[#e8e4df] bg-[#f5f3f0] touch-manipulation" id="prop-slider">
-                    <?php foreach ($p['images'] as $idx => $img): ?>
-                    <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
-                         alt="<?= htmlspecialchars($p['title']) ?>"
-                         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300<?= $idx !== 0 ? ' opacity-0' : '' ?>"
-                         data-prop-slide="<?= $idx ?>">
-                    <?php endforeach; ?>
+                <div class="swiper rounded-lg border border-[#e8e4df] bg-[#f5f3f0] touch-manipulation" id="prop-slider">
+                    <div class="swiper-wrapper">
+                        <?php foreach ($p['images'] as $img): ?>
+                        <div class="swiper-slide">
+                            <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
+                                 alt="<?= htmlspecialchars($p['title']) ?>">
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                     <?php if ($img_count > 1): ?>
-                    <button type="button" id="prop-prev" class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 rounded-full text-white text-xl flex items-center justify-center z-10 transition-colors" aria-label="ก่อนหน้า">‹</button>
-                    <button type="button" id="prop-next" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 rounded-full text-white text-xl flex items-center justify-center z-10 transition-colors" aria-label="ถัดไป">›</button>
-                    <span class="absolute bottom-3 right-3 text-xs text-white bg-black/50 px-2 py-1 rounded z-10" id="prop-count">1 / <?= $img_count ?></span>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-pagination"></div>
                     <?php endif; ?>
                 </div>
                 <?php if ($img_count > 1): ?>
-                <div class="flex gap-2 mt-2 overflow-x-auto pb-1 touch-manipulation">
-                    <?php foreach ($p['images'] as $idx => $img): ?>
-                    <button type="button"
-                            class="flex-shrink-0 w-16 h-12 rounded overflow-hidden border-2 hover:opacity-90 transition-opacity <?= $idx === 0 ? 'border-[#c9a96e]' : 'border-transparent' ?>"
-                            data-prop-thumb="<?= $idx ?>">
-                        <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
-                             alt="" class="w-full h-full object-cover" loading="lazy">
-                    </button>
-                    <?php endforeach; ?>
+                <div class="swiper touch-manipulation" id="prop-thumbs">
+                    <div class="swiper-wrapper">
+                        <?php foreach ($p['images'] as $img): ?>
+                        <div class="swiper-slide">
+                            <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
+                                 alt="" loading="lazy">
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
                 <?php endif; ?>
             </div>
@@ -261,6 +278,7 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <?php include('components/footer.php'); ?>
 
     <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         feather.replace();
         const observer = new IntersectionObserver(
@@ -271,43 +289,24 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
         window.addEventListener('load', () => {
             setTimeout(() => document.getElementById('preloader').classList.add('hide'), 400);
         });
-        // Property image slider
+        // Property image slider (Swiper)
         (function() {
-            const slides = document.querySelectorAll('[data-prop-slide]');
-            if (!slides.length) return;
-            const thumbs = document.querySelectorAll('[data-prop-thumb]');
-            const countEl = document.getElementById('prop-count');
-            const sliderEl = document.getElementById('prop-slider');
-            let cur = 0, txStart = 0, tyStart = 0;
-            function go(n) {
-                slides[cur].classList.add('opacity-0');
-                if (thumbs[cur]) {
-                    thumbs[cur].classList.remove('border-[#c9a96e]');
-                    thumbs[cur].classList.add('border-transparent');
-                }
-                cur = (n + slides.length) % slides.length;
-                slides[cur].classList.remove('opacity-0');
-                if (thumbs[cur]) {
-                    thumbs[cur].classList.remove('border-transparent');
-                    thumbs[cur].classList.add('border-[#c9a96e]');
-                }
-                if (countEl) countEl.textContent = (cur + 1) + ' / ' + slides.length;
+            const thumbEl = document.getElementById('prop-thumbs');
+            let thumbsSwiper = null;
+            if (thumbEl) {
+                thumbsSwiper = new Swiper('#prop-thumbs', {
+                    slidesPerView: 'auto',
+                    spaceBetween: 8,
+                    watchSlidesProgress: true,
+                });
             }
-            document.getElementById('prop-prev')?.addEventListener('click', () => go(cur - 1));
-            document.getElementById('prop-next')?.addEventListener('click', () => go(cur + 1));
-            thumbs.forEach((t, i) => t.addEventListener('click', () => go(i)));
-            if (sliderEl) {
-                sliderEl.addEventListener('touchstart', e => {
-                    txStart = e.touches[0].clientX;
-                    tyStart = e.touches[0].clientY;
-                }, { passive: true });
-                sliderEl.addEventListener('touchend', e => {
-                    const dx = txStart - e.changedTouches[0].clientX;
-                    const dy = tyStart - e.changedTouches[0].clientY;
-                    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-                        dx > 0 ? go(cur + 1) : go(cur - 1);
-                    }
-                }, { passive: true });
+            if (document.getElementById('prop-slider')) {
+                new Swiper('#prop-slider', {
+                    grabCursor: true,
+                    navigation: thumbEl ? { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' } : false,
+                    pagination: thumbEl ? { el: '.swiper-pagination', type: 'fraction' } : false,
+                    thumbs: thumbsSwiper ? { swiper: thumbsSwiper } : false,
+                });
             }
         })();
         // Copy link
