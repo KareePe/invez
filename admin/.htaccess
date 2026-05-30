@@ -1,0 +1,11 @@
+Options -Indexes
+
+# Redirect .php URLs to clean URLs
+RewriteEngine On
+RewriteCond %{THE_REQUEST} \s/admin/\S+\.php
+RewriteRule ^(.+)\.php$ /admin/$1 [R=301,QSA,L]
+
+# Internally serve .php for clean URLs
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+)$ $1.php [QSA,L]

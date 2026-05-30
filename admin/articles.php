@@ -13,7 +13,7 @@ include('_header.php');
 
 <div class="flex items-center justify-between mb-5">
     <p class="text-sm text-gray-500">ทั้งหมด <?= count($articles) ?> บทความ</p>
-    <a href="article-edit.php"
+    <a href="article-edit"
        class="bg-[#c9a96e] hover:bg-[#b8965e] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
         + เพิ่มบทความ
     </a>
@@ -35,7 +35,7 @@ include('_header.php');
             <tr class="hover:bg-gray-50">
                 <td class="px-5 py-3 text-gray-400 text-xs"><?= $a['id'] ?></td>
                 <td class="px-5 py-3 font-medium text-gray-800">
-                    <a href="article-edit.php?id=<?= $a['id'] ?>" class="hover:text-[#c9a96e]">
+                    <a href="article-edit?id=<?= $a['id'] ?>" class="hover:text-[#c9a96e]">
                         <?= htmlspecialchars($a['title']) ?>
                     </a>
                 </td>
@@ -47,9 +47,9 @@ include('_header.php');
                 </td>
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">
-                        <a href="article-edit.php?id=<?= $a['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800">แก้ไข</a>
-                        <form method="POST" action="article-delete.php"
-                              onsubmit="return confirm('ลบบทความนี้?')">
+                        <a href="article-edit?id=<?= $a['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800">แก้ไข</a>
+                        <form method="POST" action="article-delete"
+                              data-confirm="ลบบทความนี้?">
                             <input type="hidden" name="id" value="<?= $a['id'] ?>">
                             <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                             <button type="submit" class="text-xs text-red-500 hover:text-red-700">ลบ</button>

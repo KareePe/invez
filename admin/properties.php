@@ -16,7 +16,7 @@ include('_header.php');
 
 <div class="flex items-center justify-between mb-5">
     <p class="text-sm text-gray-500">ทั้งหมด <?= count($properties) ?> รายการ</p>
-    <a href="property-edit.php"
+    <a href="property-edit"
        class="bg-[#c9a96e] hover:bg-[#b8965e] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
         + เพิ่มทรัพย์สิน
     </a>
@@ -63,10 +63,10 @@ include('_header.php');
                 </td>
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">
-                        <a href="property-edit.php?id=<?= $p['id'] ?>"
+                        <a href="property-edit?id=<?= $p['id'] ?>"
                            class="text-xs text-blue-600 hover:text-blue-800">แก้ไข</a>
-                        <form method="POST" action="property-delete.php"
-                              onsubmit="return confirm('ลบทรัพย์สินนี้?')">
+                        <form method="POST" action="property-delete"
+                              data-confirm="ลบทรัพย์สินนี้?">
                             <input type="hidden" name="id" value="<?= $p['id'] ?>">
                             <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                             <button type="submit" class="text-xs text-red-500 hover:text-red-700">ลบ</button>

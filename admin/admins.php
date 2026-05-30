@@ -11,7 +11,7 @@ include('_header.php');
 
 <div class="flex items-center justify-between mb-5">
     <p class="text-sm text-gray-500">ทั้งหมด <?= count($admins) ?> บัญชี</p>
-    <a href="admin-edit.php"
+    <a href="admin-edit"
        class="bg-[#c9a96e] hover:bg-[#b8965e] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
         + เพิ่มแอดมิน
     </a>
@@ -36,17 +36,25 @@ include('_header.php');
                 <td class="px-5 py-3 text-gray-600"><?= htmlspecialchars($a['name']) ?></td>
                 <td class="px-5 py-3 text-gray-400 text-xs"><?= date('d/m/Y', strtotime($a['created_at'])) ?></td>
                 <td class="px-5 py-3">
+                    <?php
+                    $is_protected = $a['username'] === 'invez_test'
+                                 && ($_SESSION['admin_username'] ?? '') !== 'invez_test';
+                    ?>
                     <div class="flex items-center gap-3">
-                        <a href="admin-edit.php?id=<?= $a['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800">แก้ไข</a>
+                        <?php if ($is_protected): ?>
+                        <span class="text-xs text-gray-300">—</span>
+                        <?php else: ?>
+                        <a href="admin-edit?id=<?= $a['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800">แก้ไข</a>
                         <?php if ($a['id'] !== (int)$_SESSION['admin_id']): ?>
-                        <form method="POST" action="admin-delete.php"
-                              onsubmit="return confirm('ลบแอดมินนี้?')">
+                        <form method="POST" action="admin-delete"
+                              data-confirm="ลบแอดมินนี้?">
                             <input type="hidden" name="id" value="<?= $a['id'] ?>">
                             <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                             <button type="submit" class="text-xs text-red-500 hover:text-red-700">ลบ</button>
                         </form>
                         <?php else: ?>
                         <span class="text-xs text-gray-300">ตัวเอง</span>
+                        <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 </td>

@@ -15,9 +15,18 @@ if (!$is_new) {
     $admin = $admin->fetch();
     if (!$admin) {
         flash('error', 'ไม่พบแอดมิน');
-        header('Location: admins.php');
+        header('Location: admins');
         exit;
     }
+}
+
+if (!$is_new
+    && $admin['username'] === 'invez_test'
+    && ($_SESSION['admin_username'] ?? '') !== 'invez_test'
+) {
+    flash('error', 'ไม่มีสิทธิ์แก้ไขบัญชีนี้');
+    header('Location: admins');
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -65,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         flash('success', $is_new ? 'เพิ่มแอดมินสำเร็จ' : 'บันทึกแอดมินสำเร็จ');
-        header('Location: admins.php');
+        header('Location: admins');
         exit;
     }
 
@@ -118,7 +127,7 @@ include('_header.php');
                 class="bg-[#c9a96e] hover:bg-[#b8965e] text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors">
             บันทึก
         </button>
-        <a href="admins.php" class="text-sm text-gray-500 hover:text-gray-700">ยกเลิก</a>
+        <a href="admins" class="text-sm text-gray-500 hover:text-gray-700">ยกเลิก</a>
     </div>
 </form>
 

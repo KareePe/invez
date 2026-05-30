@@ -18,7 +18,7 @@ if (!$is_new) {
     $prop = $prop->fetch();
     if (!$prop) {
         flash('error', 'ไม่พบทรัพย์สิน');
-        header('Location: properties.php');
+        header('Location: properties');
         exit;
     }
     $highlights = db()->prepare('SELECT * FROM property_highlights WHERE property_id = ? ORDER BY sort_order ASC');
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         flash('success', $is_new ? 'เพิ่มทรัพย์สินสำเร็จ' : 'บันทึกทรัพย์สินสำเร็จ');
-        header('Location: properties.php');
+        header('Location: properties');
         exit;
     }
 
@@ -341,7 +341,7 @@ include('_header.php');
                 class="bg-[#c9a96e] hover:bg-[#b8965e] text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors">
             บันทึก
         </button>
-        <a href="properties.php" class="text-sm text-gray-500 hover:text-gray-700">ยกเลิก</a>
+        <a href="properties" class="text-sm text-gray-500 hover:text-gray-700">ยกเลิก</a>
     </div>
 </form>
 

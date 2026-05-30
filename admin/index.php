@@ -33,7 +33,7 @@ include('_header.php');
 <div class="bg-white rounded-xl border border-gray-200">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
         <h2 class="font-semibold text-gray-700 text-sm">ทรัพย์สินล่าสุด</h2>
-        <a href="properties.php" class="text-xs text-[#c9a96e] hover:underline">ดูทั้งหมด</a>
+        <a href="properties" class="text-xs text-[#c9a96e] hover:underline">ดูทั้งหมด</a>
     </div>
     <table class="w-full text-sm">
         <thead>
@@ -49,7 +49,7 @@ include('_header.php');
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-3 text-gray-400"><?= $p['id'] ?></td>
                 <td class="px-6 py-3 font-medium text-gray-800">
-                    <a href="property-edit.php?id=<?= $p['id'] ?>" class="hover:text-[#c9a96e]">
+                    <a href="property-edit?id=<?= $p['id'] ?>" class="hover:text-[#c9a96e]">
                         <?= htmlspecialchars($p['title']) ?>
                     </a>
                 </td>

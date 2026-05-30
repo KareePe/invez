@@ -3,7 +3,7 @@ require_once('auth.php');
 require_once('../config/db.php');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: properties.php');
+    header('Location: properties');
     exit;
 }
 csrf_verify();
@@ -11,7 +11,7 @@ csrf_verify();
 $id = (int)($_POST['id'] ?? 0);
 if ($id < 1) {
     flash('error', 'ID ไม่ถูกต้อง');
-    header('Location: properties.php');
+    header('Location: properties');
     exit;
 }
 
@@ -27,5 +27,5 @@ foreach ($imgs->fetchAll() as $img) {
 db()->prepare('DELETE FROM properties WHERE id = ?')->execute([$id]);
 
 flash('success', 'ลบทรัพย์สินสำเร็จ');
-header('Location: properties.php');
+header('Location: properties');
 exit;

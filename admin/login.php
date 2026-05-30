@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 require_once('../config/db.php');
 
 if (!empty($_SESSION['admin_id'])) {
-    header('Location: index.php');
+    header('Location: index');
     exit;
 }
 
@@ -23,9 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($admin && password_verify($password, $admin['password'])) {
             session_regenerate_id(true);
-            $_SESSION['admin_id']   = $admin['id'];
-            $_SESSION['admin_name'] = $admin['name'];
-            header('Location: index.php');
+            $_SESSION['admin_id']       = $admin['id'];
+            $_SESSION['admin_name']     = $admin['name'];
+            $_SESSION['admin_username'] = $username;
+            header('Location: index');
             exit;
         }
         $error = 'username หรือ password ไม่ถูกต้อง';

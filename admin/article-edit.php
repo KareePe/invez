@@ -16,7 +16,7 @@ if (!$is_new) {
     $article = $article->fetch();
     if (!$article) {
         flash('error', 'ไม่พบบทความ');
-        header('Location: articles.php');
+        header('Location: articles');
         exit;
     }
     $points = $article['points'] ? json_decode($article['points'], true) : [];
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         flash('success', $is_new ? 'เพิ่มบทความสำเร็จ' : 'บันทึกบทความสำเร็จ');
-        header('Location: articles.php');
+        header('Location: articles');
         exit;
     }
 
@@ -160,7 +160,7 @@ include('_header.php');
                 class="bg-[#c9a96e] hover:bg-[#b8965e] text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors">
             บันทึก
         </button>
-        <a href="articles.php" class="text-sm text-gray-500 hover:text-gray-700">ยกเลิก</a>
+        <a href="articles" class="text-sm text-gray-500 hover:text-gray-700">ยกเลิก</a>
     </div>
 </form>
 
