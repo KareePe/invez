@@ -116,7 +116,7 @@ $active_cats = array_keys($counts);
 
                     <!-- Image / slider -->
                     <?php $img_count = count($images); ?>
-                    <div class="relative h-44 bg-[#f5f3f0] overflow-hidden flex-shrink-0"<?= $img_count > 1 ? ' data-slider' : '' ?>>
+                    <div class="relative h-44 bg-[#f5f3f0] overflow-hidden flex-shrink-0 touch-manipulation"<?= $img_count > 1 ? ' data-slider' : '' ?>>
                         <?php if (!empty($images)): ?>
                             <?php foreach ($images as $idx => $img): ?>
                             <img src="assets/images/properties/<?= $p['id'] ?>/<?= htmlspecialchars($img) ?>"

@@ -109,7 +109,7 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             <!-- Image slider -->
             <?php if (!empty($p['images'])): $img_count = count($p['images']); ?>
             <div class="mb-8">
-                <div class="relative w-full aspect-video max-h-[480px] overflow-hidden rounded-lg border border-[#e8e4df] bg-[#f5f3f0]" id="prop-slider">
+                <div class="relative w-full aspect-video max-h-[480px] overflow-hidden rounded-lg border border-[#e8e4df] bg-[#f5f3f0] touch-manipulation" id="prop-slider">
                     <?php foreach ($p['images'] as $idx => $img): ?>
                     <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
                          alt="<?= htmlspecialchars($p['title']) ?>"
@@ -123,7 +123,7 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
                     <?php endif; ?>
                 </div>
                 <?php if ($img_count > 1): ?>
-                <div class="flex gap-2 mt-2 overflow-x-auto pb-1">
+                <div class="flex gap-2 mt-2 overflow-x-auto pb-1 touch-manipulation">
                     <?php foreach ($p['images'] as $idx => $img): ?>
                     <button type="button"
                             class="flex-shrink-0 w-16 h-12 rounded overflow-hidden border-2 hover:opacity-90 transition-opacity <?= $idx === 0 ? 'border-[#c9a96e]' : 'border-transparent' ?>"
