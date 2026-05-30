@@ -106,17 +106,39 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <section class="py-10 md:py-14 px-6 bg-white">
         <div class="max-w-4xl mx-auto">
 
-            <!-- Cover image -->
-            <?php if ($cover): ?>
-            <div class="mb-8 rounded-lg overflow-hidden border border-[#e8e4df]">
-                <img src="<?= htmlspecialchars($cover) ?>"
-                     alt="<?= htmlspecialchars($p['title']) ?>"
-                     class="w-full max-h-[440px] object-cover">
+            <!-- Image slider -->
+            <?php if (!empty($p['images'])): $img_count = count($p['images']); ?>
+            <div class="mb-8">
+                <div class="relative w-full aspect-video max-h-[480px] overflow-hidden rounded-lg border border-[#e8e4df] bg-[#f5f3f0]" id="prop-slider">
+                    <?php foreach ($p['images'] as $idx => $img): ?>
+                    <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
+                         alt="<?= htmlspecialchars($p['title']) ?>"
+                         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300<?= $idx !== 0 ? ' opacity-0' : '' ?>"
+                         data-prop-slide="<?= $idx ?>">
+                    <?php endforeach; ?>
+                    <?php if ($img_count > 1): ?>
+                    <button type="button" id="prop-prev" class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 rounded-full text-white text-xl flex items-center justify-center z-10 transition-colors" aria-label="ก่อนหน้า">‹</button>
+                    <button type="button" id="prop-next" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 rounded-full text-white text-xl flex items-center justify-center z-10 transition-colors" aria-label="ถัดไป">›</button>
+                    <span class="absolute bottom-3 right-3 text-xs text-white bg-black/50 px-2 py-1 rounded z-10" id="prop-count">1 / <?= $img_count ?></span>
+                    <?php endif; ?>
+                </div>
+                <?php if ($img_count > 1): ?>
+                <div class="flex gap-2 mt-2 overflow-x-auto pb-1">
+                    <?php foreach ($p['images'] as $idx => $img): ?>
+                    <button type="button"
+                            class="flex-shrink-0 w-16 h-12 rounded overflow-hidden border-2 hover:opacity-90 transition-opacity <?= $idx === 0 ? 'border-[#c9a96e]' : 'border-transparent' ?>"
+                            data-prop-thumb="<?= $idx ?>">
+                        <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
+                             alt="" class="w-full h-full object-cover" loading="lazy">
+                    </button>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
 
             <!-- Price + Status -->
-            <div class="flex flex-wrap items-center justify-between gap-4 py-5 border-y border-[#e8e4df] mb-8">
+            <div class="flex flex-wrap items-center justify-between gap-4 py-5 border-y border-[#e8e4df] mb-3">
                 <div>
                     <p class="text-xs text-[#9d8f82] mb-0.5">ราคา</p>
                     <p class="text-xl md:text-2xl font-semibold text-[#c9a96e]"><?= htmlspecialchars($p['price_display']) ?></p>
@@ -127,6 +149,30 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
                     <p class="text-sm font-medium text-[#1a1714]"><?= htmlspecialchars($p['status']) ?></p>
                 </div>
                 <?php endif; ?>
+            </div>
+
+            <!-- Share -->
+            <div class="flex flex-wrap items-center gap-2 mb-8">
+                <span class="text-xs text-[#9d8f82]">แชร์:</span>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode('https://www.invez.biz/property/'.$id) ?>"
+                   target="_blank" rel="noopener noreferrer"
+                   class="text-xs text-white bg-[#1877F2] hover:bg-[#1464cc] px-3 py-1.5 rounded transition-colors">
+                    Facebook
+                </a>
+                <a href="https://line.me/R/msg/text/?<?= urlencode($p['title'].' https://www.invez.biz/property/'.$id) ?>"
+                   target="_blank" rel="noopener noreferrer"
+                   class="text-xs text-white bg-[#06C755] hover:bg-[#05a849] px-3 py-1.5 rounded transition-colors">
+                    Line
+                </a>
+                <a href="https://twitter.com/intent/tweet?url=<?= urlencode('https://www.invez.biz/property/'.$id) ?>&text=<?= urlencode($p['title']) ?>"
+                   target="_blank" rel="noopener noreferrer"
+                   class="text-xs text-white bg-[#1a1714] hover:bg-black px-3 py-1.5 rounded transition-colors">
+                    X
+                </a>
+                <button type="button" id="copy-btn"
+                        class="text-xs text-[#6b5f52] border border-[#e8e4df] hover:border-[#1a1714] hover:text-[#1a1714] px-3 py-1.5 rounded transition-colors">
+                    คัดลอกลิงก์
+                </button>
             </div>
 
             <!-- Key stats -->
@@ -181,21 +227,6 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             </div>
             <?php endif; ?>
 
-            <!-- Gallery -->
-            <?php if (count($p['images']) > 1): ?>
-            <div class="mb-8">
-                <h2 class="text-base font-semibold text-[#1a1714] mb-4">รูปภาพทั้งหมด</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    <?php foreach ($p['images'] as $img): ?>
-                    <div class="rounded-lg overflow-hidden border border-[#e8e4df] aspect-[4/3]">
-                        <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
-                             alt="<?= htmlspecialchars($p['title']) ?>"
-                             class="w-full h-full object-cover">
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <?php endif; ?>
 
         </div>
     </section>
@@ -239,6 +270,40 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
         document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
         window.addEventListener('load', () => {
             setTimeout(() => document.getElementById('preloader').classList.add('hide'), 400);
+        });
+        // Property image slider
+        (function() {
+            const slides = document.querySelectorAll('[data-prop-slide]');
+            if (!slides.length) return;
+            const thumbs = document.querySelectorAll('[data-prop-thumb]');
+            const countEl = document.getElementById('prop-count');
+            let cur = 0;
+            function go(n) {
+                slides[cur].classList.add('opacity-0');
+                if (thumbs[cur]) {
+                    thumbs[cur].classList.remove('border-[#c9a96e]');
+                    thumbs[cur].classList.add('border-transparent');
+                }
+                cur = (n + slides.length) % slides.length;
+                slides[cur].classList.remove('opacity-0');
+                if (thumbs[cur]) {
+                    thumbs[cur].classList.remove('border-transparent');
+                    thumbs[cur].classList.add('border-[#c9a96e]');
+                }
+                if (countEl) countEl.textContent = (cur + 1) + ' / ' + slides.length;
+            }
+            document.getElementById('prop-prev')?.addEventListener('click', () => go(cur - 1));
+            document.getElementById('prop-next')?.addEventListener('click', () => go(cur + 1));
+            thumbs.forEach((t, i) => t.addEventListener('click', () => go(i)));
+        })();
+        // Copy link
+        document.getElementById('copy-btn')?.addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                const btn = document.getElementById('copy-btn');
+                const orig = btn.textContent;
+                btn.textContent = 'คัดลอกแล้ว!';
+                setTimeout(() => { btn.textContent = orig; }, 2000);
+            });
         });
     </script>
 </body>

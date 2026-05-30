@@ -9,19 +9,19 @@ if (!in_array($filter, $valid_cats, true)) $filter = 'all';
 
 if ($filter === 'all') {
     $stmt = db()->query(
-        'SELECT p.id, p.category, p.title, p.subtitle, p.price_display, p.location_short,
+        "SELECT p.id, p.category, p.title, p.subtitle, p.price_display, p.location_short,
                 p.status, p.land_area, p.beds, p.floors,
-                (SELECT filename FROM property_images WHERE property_id = p.id ORDER BY sort_order ASC LIMIT 1) AS first_image
+                (SELECT GROUP_CONCAT(filename ORDER BY sort_order ASC SEPARATOR '|') FROM property_images WHERE property_id = p.id) AS images_csv
          FROM properties p WHERE p.is_active = 1
-         ORDER BY p.sort_order ASC, p.id ASC'
+         ORDER BY p.sort_order ASC, p.id ASC"
     );
 } else {
     $stmt = db()->prepare(
-        'SELECT p.id, p.category, p.title, p.subtitle, p.price_display, p.location_short,
+        "SELECT p.id, p.category, p.title, p.subtitle, p.price_display, p.location_short,
                 p.status, p.land_area, p.beds, p.floors,
-                (SELECT filename FROM property_images WHERE property_id = p.id ORDER BY sort_order ASC LIMIT 1) AS first_image
+                (SELECT GROUP_CONCAT(filename ORDER BY sort_order ASC SEPARATOR '|') FROM property_images WHERE property_id = p.id) AS images_csv
          FROM properties p WHERE p.is_active = 1 AND p.category = ?
-         ORDER BY p.sort_order ASC, p.id ASC'
+         ORDER BY p.sort_order ASC, p.id ASC"
     );
     $stmt->execute([$filter]);
 }
@@ -108,31 +108,42 @@ $active_cats = array_keys($counts);
             <!-- Property grid -->
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <?php foreach ($properties as $p):
-                    $cover     = $p['first_image'] ? 'assets/images/properties/'.$p['id'].'/'.$p['first_image'] : null;
+                    $images    = !empty($p['images_csv']) ? array_values(array_filter(explode('|', $p['images_csv']))) : [];
                     $cat_label = get_category_label($property_categories, $p['category']);
                 ?>
                 <a href="/property/<?= $p['id'] ?>"
                    class="bg-white rounded-lg border border-[#e8e4df] hover:border-[#c9a96e] transition-colors duration-150 flex flex-col overflow-hidden group">
 
-                    <!-- Cover image -->
-                    <div class="relative h-44 bg-[#f5f3f0] overflow-hidden flex-shrink-0">
-                        <?php if ($cover): ?>
-                        <img src="<?= htmlspecialchars($cover) ?>"
-                             alt="<?= htmlspecialchars($p['title']) ?>"
-                             class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500">
+                    <!-- Image / slider -->
+                    <?php $img_count = count($images); ?>
+                    <div class="relative h-44 bg-[#f5f3f0] overflow-hidden flex-shrink-0"<?= $img_count > 1 ? ' data-slider' : '' ?>>
+                        <?php if (!empty($images)): ?>
+                            <?php foreach ($images as $idx => $img): ?>
+                            <img src="assets/images/properties/<?= $p['id'] ?>/<?= htmlspecialchars($img) ?>"
+                                 alt="<?= htmlspecialchars($p['title']) ?>"
+                                 class="<?= $img_count > 1
+                                     ? ('absolute inset-0 w-full h-full object-cover transition-opacity duration-300' . ($idx !== 0 ? ' opacity-0' : ''))
+                                     : 'w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500' ?>"
+                                 <?= $img_count > 1 ? 'data-slide="'.$idx.'"' : '' ?>>
+                            <?php endforeach; ?>
                         <?php else: ?>
-                        <div class="w-full h-full flex items-center justify-center">
-                            <i data-feather="<?= htmlspecialchars(get_category_icon($property_categories, $p['category'])) ?>"
-                               style="width:32px;height:32px;color:#c9a96e;opacity:0.35;"></i>
-                        </div>
+                            <div class="w-full h-full flex items-center justify-center">
+                                <i data-feather="<?= htmlspecialchars(get_category_icon($property_categories, $p['category'])) ?>"
+                                   style="width:32px;height:32px;color:#c9a96e;opacity:0.35;"></i>
+                            </div>
                         <?php endif; ?>
-                        <span class="absolute top-3 left-3 text-[10px] font-medium text-[#6b5f52] bg-white/95 px-2 py-1 rounded">
+                        <span class="absolute top-3 left-3 text-[10px] font-medium text-[#6b5f52] bg-white/95 px-2 py-1 rounded z-10">
                             <?= htmlspecialchars($cat_label) ?>
                         </span>
                         <?php if (!empty($p['status'])): ?>
-                        <span class="absolute top-3 right-3 text-[10px] text-[#6b5f52] bg-white/95 px-2 py-1 rounded">
+                        <span class="absolute top-3 right-3 text-[10px] text-[#6b5f52] bg-white/95 px-2 py-1 rounded z-10">
                             <?= htmlspecialchars($p['status']) ?>
                         </span>
+                        <?php endif; ?>
+                        <?php if ($img_count > 1): ?>
+                        <button type="button" class="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 bg-black/30 hover:bg-black/50 rounded-full text-white flex items-center justify-center z-10 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity" data-prev aria-label="ก่อนหน้า">‹</button>
+                        <button type="button" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 bg-black/30 hover:bg-black/50 rounded-full text-white flex items-center justify-center z-10 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity" data-next aria-label="ถัดไป">›</button>
+                        <span class="absolute bottom-2 right-2 text-[9px] text-white bg-black/40 px-1.5 py-0.5 rounded z-10" data-counter>1 / <?= $img_count ?></span>
                         <?php endif; ?>
                     </div>
 
@@ -231,6 +242,20 @@ $active_cats = array_keys($counts);
         document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
         window.addEventListener('load', () => {
             setTimeout(() => document.getElementById('preloader').classList.add('hide'), 400);
+        });
+        document.querySelectorAll('[data-slider]').forEach(slider => {
+            const slides = slider.querySelectorAll('[data-slide]');
+            const counter = slider.querySelector('[data-counter]');
+            if (!slides.length) return;
+            let cur = 0;
+            function go(n) {
+                slides[cur].classList.add('opacity-0');
+                cur = (n + slides.length) % slides.length;
+                slides[cur].classList.remove('opacity-0');
+                if (counter) counter.textContent = (cur + 1) + ' / ' + slides.length;
+            }
+            slider.querySelector('[data-prev]')?.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); go(cur - 1); });
+            slider.querySelector('[data-next]')?.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); go(cur + 1); });
         });
     </script>
 </body>
