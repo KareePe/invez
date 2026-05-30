@@ -277,7 +277,8 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             if (!slides.length) return;
             const thumbs = document.querySelectorAll('[data-prop-thumb]');
             const countEl = document.getElementById('prop-count');
-            let cur = 0;
+            const sliderEl = document.getElementById('prop-slider');
+            let cur = 0, txStart = 0, tyStart = 0;
             function go(n) {
                 slides[cur].classList.add('opacity-0');
                 if (thumbs[cur]) {
@@ -295,6 +296,19 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             document.getElementById('prop-prev')?.addEventListener('click', () => go(cur - 1));
             document.getElementById('prop-next')?.addEventListener('click', () => go(cur + 1));
             thumbs.forEach((t, i) => t.addEventListener('click', () => go(i)));
+            if (sliderEl) {
+                sliderEl.addEventListener('touchstart', e => {
+                    txStart = e.touches[0].clientX;
+                    tyStart = e.touches[0].clientY;
+                }, { passive: true });
+                sliderEl.addEventListener('touchend', e => {
+                    const dx = txStart - e.changedTouches[0].clientX;
+                    const dy = tyStart - e.changedTouches[0].clientY;
+                    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                        dx > 0 ? go(cur + 1) : go(cur - 1);
+                    }
+                }, { passive: true });
+            }
         })();
         // Copy link
         document.getElementById('copy-btn')?.addEventListener('click', () => {

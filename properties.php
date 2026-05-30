@@ -247,7 +247,7 @@ $active_cats = array_keys($counts);
             const slides = slider.querySelectorAll('[data-slide]');
             const counter = slider.querySelector('[data-counter]');
             if (!slides.length) return;
-            let cur = 0;
+            let cur = 0, txStart = 0, tyStart = 0, swiped = false;
             function go(n) {
                 slides[cur].classList.add('opacity-0');
                 cur = (n + slides.length) % slides.length;
@@ -256,6 +256,20 @@ $active_cats = array_keys($counts);
             }
             slider.querySelector('[data-prev]')?.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); go(cur - 1); });
             slider.querySelector('[data-next]')?.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); go(cur + 1); });
+            slider.addEventListener('touchstart', e => {
+                txStart = e.touches[0].clientX;
+                tyStart = e.touches[0].clientY;
+                swiped = false;
+            }, { passive: true });
+            slider.addEventListener('touchend', e => {
+                const dx = txStart - e.changedTouches[0].clientX;
+                const dy = tyStart - e.changedTouches[0].clientY;
+                if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                    swiped = true;
+                    dx > 0 ? go(cur + 1) : go(cur - 1);
+                }
+            }, { passive: true });
+            slider.addEventListener('click', e => { if (swiped) { e.preventDefault(); e.stopPropagation(); swiped = false; } });
         });
     </script>
 </body>
