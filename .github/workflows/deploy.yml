@@ -1,11 +1,14 @@
-name: Invez Deploy to Production
+name: Invez Deploy
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - uat
 
 jobs:
-  deploy:
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +24,7 @@ jobs:
           DB_CHARSET=utf8mb4
           EOF
 
-      - name: Deploy via FTP
+      - name: Deploy Production via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -29,6 +32,39 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           server-dir: /httpdocs/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/database/**
+            **/.env.example
+            **/CLAUDE.md
+            **/.github/**
+
+  deploy-uat:
+    if: github.ref == 'refs/heads/uat'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env from secrets
+        run: |
+          cat > .env << EOF
+          DB_HOST=${{ secrets.DB_UAT_HOST }}
+          DB_NAME=${{ secrets.DB_UAT_NAME }}
+          DB_USER=${{ secrets.DB_UAT_USER }}
+          DB_PASS=${{ secrets.DB_UAT_PASS }}
+          DB_CHARSET=utf8mb4
+          EOF
+
+      - name: Deploy UAT via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_UAT_SERVER }}
+          username: ${{ secrets.FTP_UAT_USERNAME }}
+          password: ${{ secrets.FTP_UAT_PASSWORD }}
+          protocol: ftps
+          server-dir: /uat.invez.biz/
           exclude: |
             **/.git*
             **/.git*/**
