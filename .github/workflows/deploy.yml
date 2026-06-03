@@ -68,6 +68,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           server-dir: /uat.invez.biz/
+          log-level: verbose
           exclude: |
             **/.git*
             **/.git*/**
