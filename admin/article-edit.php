@@ -111,8 +111,8 @@ include('_header.php');
     <div class="flex items-center gap-3">
         <span class="text-xs font-medium text-gray-500">ภาษา / Language:</span>
         <div class="flex text-xs border border-gray-200 rounded-lg overflow-hidden">
-            <button type="button" class="lang-tab-btn px-4 py-1.5 font-medium bg-[#c9a96e] text-white" data-lang="th">🇹🇭 TH</button>
-            <button type="button" class="lang-tab-btn px-4 py-1.5 font-medium text-gray-500 hover:bg-gray-50" data-lang="en">🇬🇧 EN</button>
+            <button type="button" class="lang-tab-btn px-4 py-1.5 font-medium bg-[#c9a96e] text-white" data-lang="th">TH</button>
+            <button type="button" class="lang-tab-btn px-4 py-1.5 font-medium text-gray-500 hover:bg-gray-50" data-lang="en">EN</button>
         </div>
     </div>
 

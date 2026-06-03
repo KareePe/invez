@@ -32,6 +32,7 @@ require_once(__DIR__ . '/../config/lang.php');
                 <a href="/" class="nav-link <?= $current_page === 'home'       ? $link_active : $link_base ?> transition-colors duration-150"><?= t('หน้าแรก','Home') ?></a>
                 <a href="/about" class="nav-link <?= $current_page === 'about'  ? $link_active : $link_base ?> transition-colors duration-150"><?= t('เกี่ยวกับเรา','About') ?></a>
                 <a href="/properties" class="nav-link <?= $current_page === 'properties' ? $link_active : $link_base ?> transition-colors duration-150"><?= t('ทรัพย์สิน','Properties') ?></a>
+                <a href="/portfolio" class="nav-link <?= $current_page === 'portfolio' ? $link_active : $link_base ?> transition-colors duration-150"><?= t('ผลงาน','Portfolio') ?></a>
                 <a href="/content" class="nav-link <?= $current_page === 'content' ? $link_active : $link_base ?> transition-colors duration-150"><?= t('คอนเทนท์','Content') ?></a>
                 <!-- Language toggle desktop -->
                 <div class="lang-toggle flex items-center text-[10px] font-semibold tracking-wider gap-0.5">
@@ -48,6 +49,15 @@ require_once(__DIR__ . '/../config/lang.php');
                                 : ($navbar_dark ? 'text-white/35 hover:text-white/60' : 'text-[#9d8f82] hover:text-[#6b5f52]') ?>">EN</a>
                 </div>
                 <a href="/contact" class="nav-btn px-4 py-1.5 rounded text-sm transition-colors duration-150 <?= $btn_class ?>"><?= t('ติดต่อเรา','Contact') ?></a>
+                <!-- Member area desktop -->
+                <?php if (!empty($_SESSION['member_id'])): ?>
+                <div class="flex items-center gap-2 text-xs <?= $navbar_dark ? 'text-white/60' : 'text-[#9d8f82]' ?>">
+                    <span class="max-w-[80px] truncate"><?= htmlspecialchars($_SESSION['member_name'] ?? '') ?></span>
+                    <a href="/logout" class="hover:<?= $navbar_dark ? 'text-white' : 'text-[#1a1714]' ?> transition-colors"><?= t('ออก','Logout') ?></a>
+                </div>
+                <?php else: ?>
+                <a href="/login" class="text-xs <?= $navbar_dark ? 'text-white/60 hover:text-white' : 'text-[#9d8f82] hover:text-[#1a1714]' ?> transition-colors"><?= t('เข้าสู่ระบบ','Login') ?></a>
+                <?php endif; ?>
             </div>
 
             <!-- Mobile hamburger -->
@@ -64,8 +74,21 @@ require_once(__DIR__ . '/../config/lang.php');
             <a href="/" class="hover:text-<?= $navbar_dark ? 'white' : '[#1a1714]' ?> transition-colors"><?= t('หน้าแรก','Home') ?></a>
             <a href="/about" class="hover:text-<?= $navbar_dark ? 'white' : '[#1a1714]' ?> transition-colors"><?= t('เกี่ยวกับเรา','About') ?></a>
             <a href="/properties" class="hover:text-<?= $navbar_dark ? 'white' : '[#1a1714]' ?> transition-colors"><?= t('ทรัพย์สิน','Properties') ?></a>
+            <a href="/portfolio" class="hover:text-<?= $navbar_dark ? 'white' : '[#1a1714]' ?> transition-colors"><?= t('ผลงาน','Portfolio') ?></a>
             <a href="/content" class="hover:text-<?= $navbar_dark ? 'white' : '[#1a1714]' ?> transition-colors"><?= t('คอนเทนท์','Content') ?></a>
             <a href="/contact" class="<?= $navbar_dark ? 'text-white font-medium' : 'text-[#1a1714] font-medium' ?>"><?= t('ติดต่อเรา','Contact') ?></a>
+            <!-- Member mobile -->
+            <?php if (!empty($_SESSION['member_id'])): ?>
+            <div class="flex items-center justify-between text-xs pt-1">
+                <span class="<?= $navbar_dark ? 'text-white/50' : 'text-[#9d8f82]' ?>"><?= htmlspecialchars($_SESSION['member_name'] ?? '') ?></span>
+                <a href="/logout" class="<?= $navbar_dark ? 'text-white/60 hover:text-white' : 'text-[#9d8f82] hover:text-[#1a1714]' ?> transition-colors"><?= t('ออกจากระบบ','Logout') ?></a>
+            </div>
+            <?php else: ?>
+            <div class="flex items-center gap-3 text-xs pt-1">
+                <a href="/login" class="<?= $navbar_dark ? 'text-white/60 hover:text-white' : 'text-[#9d8f82] hover:text-[#1a1714]' ?> transition-colors"><?= t('เข้าสู่ระบบ','Login') ?></a>
+                <a href="/register" class="text-[#c9a96e] hover:text-[#b8965e] font-medium transition-colors"><?= t('สมัครสมาชิก','Register') ?></a>
+            </div>
+            <?php endif; ?>
             <!-- Language toggle mobile -->
             <div class="flex items-center gap-1 text-[10px] font-semibold tracking-wider pt-2 border-t <?= $navbar_dark ? 'border-white/10' : 'border-[#e8e4df]' ?>">
                 <a href="/lang?set=th"

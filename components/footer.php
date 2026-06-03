@@ -53,6 +53,7 @@
         <div class="flex gap-5">
             <a href="/about" class="hover:text-white/50 transition-colors"><?= t('เกี่ยวกับเรา','About') ?></a>
             <a href="/properties" class="hover:text-white/50 transition-colors"><?= t('ทรัพย์สิน','Properties') ?></a>
+            <a href="/portfolio" class="hover:text-white/50 transition-colors"><?= t('ผลงาน','Portfolio') ?></a>
             <a href="/content" class="hover:text-white/50 transition-colors"><?= t('คอนเทนท์','Content') ?></a>
             <a href="/contact" class="hover:text-white/50 transition-colors"><?= t('ติดต่อเรา','Contact') ?></a>
         </div>
