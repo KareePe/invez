@@ -16,7 +16,7 @@ if (isset($_GET['delete']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
         db()->prepare('DELETE FROM articles WHERE id=?')->execute([$del_id]);
         member_flash('success', t('ลบสำเร็จ','Deleted successfully'));
     }
-    header('Location: articles.php');
+    header('Location: articles');
     exit;
 }
 
@@ -32,7 +32,7 @@ if (!$is_new) {
     $article = $stmt->fetch();
     if (!$article) {
         member_flash('error', t('ไม่พบข้อมูลหรือไม่สามารถแก้ไขได้','Not found or cannot be edited'));
-        header('Location: articles.php');
+        header('Location: articles');
         exit;
     }
     $points = $article['points'] ? json_decode($article['points'], true) : [];
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_GET['delete'])) {
         }
 
         member_flash('success', $is_new ? t('ส่งคอนเท้นสำเร็จ รอการยืนยัน','Content submitted, awaiting approval') : t('บันทึกเรียบร้อย','Saved'));
-        header('Location: articles.php');
+        header('Location: articles');
         exit;
     }
 
@@ -164,7 +164,7 @@ include('_header.php');
         <button type="submit" class="bg-[#c9a96e] hover:bg-[#b8965e] text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors">
             <?= $is_new ? t('ส่งรอยืนยัน','Submit for Approval') : t('บันทึก','Save') ?>
         </button>
-        <a href="articles.php" class="text-sm text-[#9d8f82] hover:text-[#6b5f52]"><?= t('ยกเลิก','Cancel') ?></a>
+        <a href="articles" class="text-sm text-[#9d8f82] hover:text-[#6b5f52]"><?= t('ยกเลิก','Cancel') ?></a>
     </div>
 </form>
 

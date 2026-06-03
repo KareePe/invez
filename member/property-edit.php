@@ -26,7 +26,7 @@ if (isset($_GET['delete']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
         db()->prepare('DELETE FROM properties WHERE id=?')->execute([$del_id]);
         member_flash('success', t('ลบสำเร็จ','Deleted successfully'));
     }
-    header('Location: properties.php');
+    header('Location: properties');
     exit;
 }
 
@@ -42,7 +42,7 @@ if (!$is_new) {
     $prop = $stmt->fetch();
     if (!$prop) {
         member_flash('error', t('ไม่พบข้อมูลหรือไม่สามารถแก้ไขได้','Not found or cannot be edited'));
-        header('Location: properties.php');
+        header('Location: properties');
         exit;
     }
     $highlights = db()->prepare('SELECT * FROM property_highlights WHERE property_id=? ORDER BY sort_order ASC');
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_GET['delete'])) {
         }
 
         member_flash('success', $is_new ? t('ส่งทรัพย์สินสำเร็จ รอการยืนยัน','Property submitted, awaiting approval') : t('บันทึกเรียบร้อย','Saved'));
-        header('Location: properties.php');
+        header('Location: properties');
         exit;
     }
 
@@ -319,7 +319,7 @@ include('_header.php');
         <button type="submit" class="bg-[#c9a96e] hover:bg-[#b8965e] text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors">
             <?= $is_new ? t('ส่งรอยืนยัน','Submit for Approval') : t('บันทึก','Save') ?>
         </button>
-        <a href="properties.php" class="text-sm text-[#9d8f82] hover:text-[#6b5f52]"><?= t('ยกเลิก','Cancel') ?></a>
+        <a href="properties" class="text-sm text-[#9d8f82] hover:text-[#6b5f52]"><?= t('ยกเลิก','Cancel') ?></a>
     </div>
 </form>
 

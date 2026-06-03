@@ -18,7 +18,7 @@ include('_header.php');
 
 <div class="flex items-center justify-between mb-5">
     <p class="text-sm text-[#9d8f82]"><?= t('ทั้งหมด','Total') ?> <?= count($properties) ?> <?= t('รายการ','items') ?></p>
-    <a href="property-edit.php"
+    <a href="property-edit"
        class="bg-[#c9a96e] hover:bg-[#b8965e] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
         + <?= t('ลงทรัพย์สิน','Submit Property') ?>
     </a>
@@ -51,7 +51,7 @@ include('_header.php');
             <tr class="hover:bg-[#fafaf8]">
                 <td class="px-5 py-3 font-medium text-[#1a1714]">
                     <?php if ($p['approval_status'] === 'pending'): ?>
-                    <a href="property-edit.php?id=<?= $p['id'] ?>" class="hover:text-[#c9a96e]"><?= htmlspecialchars($p['title']) ?></a>
+                    <a href="property-edit?id=<?= $p['id'] ?>" class="hover:text-[#c9a96e]"><?= htmlspecialchars($p['title']) ?></a>
                     <?php else: ?>
                     <?= htmlspecialchars($p['title']) ?>
                     <?php endif; ?>
@@ -65,10 +65,10 @@ include('_header.php');
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">
                         <?php if ($p['approval_status'] === 'pending'): ?>
-                        <a href="property-edit.php?id=<?= $p['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800"><?= t('แก้ไข','Edit') ?></a>
+                        <a href="property-edit?id=<?= $p['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800"><?= t('แก้ไข','Edit') ?></a>
                         <?php endif; ?>
                         <?php if ($p['approval_status'] !== 'approved'): ?>
-                        <form method="POST" action="property-edit.php?delete=1" data-confirm="<?= t('ลบทรัพย์สินนี้?','Delete this property?') ?>">
+                        <form method="POST" action="property-edit?delete=1" data-confirm="<?= t('ลบทรัพย์สินนี้?','Delete this property?') ?>">
                             <input type="hidden" name="csrf_token" value="<?= member_csrf_token() ?>">
                             <input type="hidden" name="id" value="<?= $p['id'] ?>">
                             <button type="submit" class="text-xs text-red-500 hover:text-red-700"><?= t('ลบ','Delete') ?></button>
