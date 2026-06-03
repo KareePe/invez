@@ -1,5 +1,6 @@
 <?php
 $current_page = 'properties';
+require_once('config/lang.php');
 require_once('config/db.php');
 require_once('properties_data.php');
 
@@ -9,16 +10,18 @@ if (!in_array($filter, $valid_cats, true)) $filter = 'all';
 
 if ($filter === 'all') {
     $stmt = db()->query(
-        "SELECT p.id, p.category, p.title, p.subtitle, p.price_display, p.location_short,
-                p.status, p.land_area, p.beds, p.floors,
+        "SELECT p.id, p.category, p.title, p.title_en, p.subtitle, p.subtitle_en,
+                p.price_display, p.location_short, p.location_short_en,
+                p.status, p.status_en, p.land_area, p.beds, p.floors,
                 (SELECT GROUP_CONCAT(filename ORDER BY sort_order ASC SEPARATOR '|') FROM property_images WHERE property_id = p.id) AS images_csv
          FROM properties p WHERE p.is_active = 1
          ORDER BY p.sort_order ASC, p.id ASC"
     );
 } else {
     $stmt = db()->prepare(
-        "SELECT p.id, p.category, p.title, p.subtitle, p.price_display, p.location_short,
-                p.status, p.land_area, p.beds, p.floors,
+        "SELECT p.id, p.category, p.title, p.title_en, p.subtitle, p.subtitle_en,
+                p.price_display, p.location_short, p.location_short_en,
+                p.status, p.status_en, p.land_area, p.beds, p.floors,
                 (SELECT GROUP_CONCAT(filename ORDER BY sort_order ASC SEPARATOR '|') FROM property_images WHERE property_id = p.id) AS images_csv
          FROM properties p WHERE p.is_active = 1 AND p.category = ?
          ORDER BY p.sort_order ASC, p.id ASC"
@@ -35,7 +38,7 @@ $total = array_sum($counts);
 $active_cats = array_keys($counts);
 ?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= lang() ?>">
 
 <head>
     <meta charset="UTF-8" />
@@ -75,10 +78,10 @@ $active_cats = array_keys($counts);
         <div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
             <div class="fade-up max-w-xl">
                 <h1 class="text-2xl md:text-3xl font-semibold text-[#1a1714] leading-snug mb-3">
-                    ทรัพย์สินทั้งหมด
+                    <?= t('ทรัพย์สินทั้งหมด','All Properties') ?>
                 </h1>
                 <p class="text-[#6b5f52] text-sm leading-6">
-                    <?= $total ?> รายการ · <?= count($active_cats) ?> ประเภท จากทีมที่ปรึกษา INVEZ
+                    <?= $total ?> <?= t('รายการ · '.count($active_cats).' ประเภท จากทีมที่ปรึกษา INVEZ','listings · '.count($active_cats).' categories from INVEZ advisors') ?>
                 </p>
             </div>
         </div>
@@ -93,14 +96,14 @@ $active_cats = array_keys($counts);
                 <a href="/properties"
                    class="px-3.5 py-1.5 rounded text-sm transition-colors duration-150
                           <?= $filter === 'all' ? 'bg-[#1a1714] text-white' : 'border border-[#e8e4df] text-[#6b5f52] hover:border-[#1a1714] hover:text-[#1a1714]' ?>">
-                    ทั้งหมด <span class="<?= $filter === 'all' ? 'text-white/70' : 'text-[#9d8f82]' ?>">(<?= $total ?>)</span>
+                    <?= t('ทั้งหมด','All') ?> <span class="<?= $filter === 'all' ? 'text-white/70' : 'text-[#9d8f82]' ?>">(<?= $total ?>)</span>
                 </a>
                 <?php foreach ($property_categories as $cat):
                     if (!in_array($cat['id'], $active_cats, true)) continue; ?>
                 <a href="/properties?cat=<?= $cat['id'] ?>"
                    class="px-3.5 py-1.5 rounded text-sm transition-colors duration-150
                           <?= $filter === $cat['id'] ? 'bg-[#1a1714] text-white' : 'border border-[#e8e4df] text-[#6b5f52] hover:border-[#1a1714] hover:text-[#1a1714]' ?>">
-                    <?= htmlspecialchars($cat['label']) ?> <span class="<?= $filter === $cat['id'] ? 'text-white/70' : 'text-[#9d8f82]' ?>">(<?= $counts[$cat['id']] ?>)</span>
+                    <?= htmlspecialchars(get_category_label($property_categories, $cat['id'], lang())) ?> <span class="<?= $filter === $cat['id'] ? 'text-white/70' : 'text-[#9d8f82]' ?>">(<?= $counts[$cat['id']] ?>)</span>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -109,7 +112,7 @@ $active_cats = array_keys($counts);
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <?php foreach ($properties as $p):
                     $images    = !empty($p['images_csv']) ? array_values(array_filter(explode('|', $p['images_csv']))) : [];
-                    $cat_label = get_category_label($property_categories, $p['category']);
+                    $cat_label = get_category_label($property_categories, $p['category'], lang());
                 ?>
                 <a href="/property/<?= $p['id'] ?>"
                    class="bg-white rounded-lg border border-[#e8e4df] hover:border-[#c9a96e] transition-colors duration-150 flex flex-col overflow-hidden group">
@@ -150,12 +153,12 @@ $active_cats = array_keys($counts);
                     <!-- Card body -->
                     <div class="p-4 flex-1 flex flex-col">
                         <h2 class="font-medium text-[#1a1714] text-sm leading-5 mb-1.5">
-                            <?= htmlspecialchars($p['title']) ?>
+                            <?= htmlspecialchars(tf($p, 'title')) ?>
                         </h2>
                         <?php if (!empty($p['location_short'])): ?>
                         <p class="text-[#9d8f82] text-xs mb-3 flex items-center gap-1">
                             <i data-feather="map-pin" style="width:10px;height:10px;flex-shrink:0;"></i>
-                            <?= htmlspecialchars($p['location_short']) ?>
+                            <?= htmlspecialchars(tf($p, 'location_short')) ?>
                         </p>
                         <?php endif; ?>
 
@@ -165,7 +168,7 @@ $active_cats = array_keys($counts);
                             <span><?= htmlspecialchars($p['land_area']) ?></span>
                             <?php endif; ?>
                             <?php if (!empty($p['beds'])): ?>
-                            <span><?= $p['beds'] ?> <?= $p['category'] === 'hospital' ? 'เตียง' : 'ห้องนอน' ?></span>
+                            <span><?= $p['beds'] ?> <?= $p['category'] === 'hospital' ? t('เตียง','beds') : t('ห้องนอน','bedrooms') ?></span>
                             <?php endif; ?>
                             <?php if (!empty($p['floors'])): ?>
                             <span><?= htmlspecialchars($p['floors']) ?></span>
@@ -177,7 +180,7 @@ $active_cats = array_keys($counts);
                                 <?= htmlspecialchars($p['price_display'] ?? '') ?>
                             </span>
                             <span class="text-[#9d8f82] text-xs group-hover:text-[#1a1714] transition-colors">
-                                ดูรายละเอียด →
+                                <?= t('ดูรายละเอียด →','View Details →') ?>
                             </span>
                         </div>
                     </div>
@@ -192,8 +195,8 @@ $active_cats = array_keys($counts);
     <section class="py-12 md:py-16 px-6 bg-[#fafaf8] border-t border-[#e8e4df]">
         <div class="max-w-6xl mx-auto">
             <div class="mb-8">
-                <h2 class="text-base font-semibold text-[#1a1714]">27 หมวดหมู่ที่เราดูแล</h2>
-                <p class="text-[#9d8f82] text-sm mt-1">ทรัพย์สินที่ไม่มีในรายการ สามารถสอบถามได้โดยตรง</p>
+                <h2 class="text-base font-semibold text-[#1a1714]"><?= t('27 หมวดหมู่ที่เราดูแล','27 Categories We Cover') ?></h2>
+                <p class="text-[#9d8f82] text-sm mt-1"><?= t('ทรัพย์สินที่ไม่มีในรายการ สามารถสอบถามได้โดยตรง','Don\'t see what you\'re looking for? Contact us directly.') ?></p>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                 <?php foreach ($property_categories as $cat):
@@ -203,12 +206,12 @@ $active_cats = array_keys($counts);
                 <a href="/properties?cat=<?= $cat['id'] ?>"
                    class="flex items-center gap-2.5 p-3 rounded-lg border border-[#e8e4df] bg-white hover:border-[#c9a96e] transition-colors duration-150">
                     <i data-feather="<?= $cat['icon'] ?>" style="width:14px;height:14px;color:#c9a96e;flex-shrink:0;"></i>
-                    <span class="text-xs text-[#1a1714] leading-4 truncate"><?= htmlspecialchars($cat['label']) ?></span>
+                    <span class="text-xs text-[#1a1714] leading-4 truncate"><?= htmlspecialchars(get_category_label($property_categories, $cat['id'], lang())) ?></span>
                 </a>
                 <?php else: ?>
                 <div class="flex items-center gap-2.5 p-3 rounded-lg border border-[#f0ebe3] bg-white/60">
                     <i data-feather="<?= $cat['icon'] ?>" style="width:14px;height:14px;color:#b8a898;flex-shrink:0;"></i>
-                    <span class="text-xs text-[#9d8f82] leading-4 truncate"><?= htmlspecialchars($cat['label']) ?></span>
+                    <span class="text-xs text-[#9d8f82] leading-4 truncate"><?= htmlspecialchars(get_category_label($property_categories, $cat['id'], lang())) ?></span>
                 </div>
                 <?php endif; ?>
                 <?php endforeach; ?>
@@ -219,13 +222,13 @@ $active_cats = array_keys($counts);
     <!-- CTA -->
     <section class="py-14 px-6 bg-[#1a1714]">
         <div class="max-w-2xl mx-auto text-center">
-            <h2 class="text-xl font-semibold text-white mb-3">ไม่เจอทรัพย์สินที่ต้องการ?</h2>
+            <h2 class="text-xl font-semibold text-white mb-3"><?= t('ไม่เจอทรัพย์สินที่ต้องการ?','Can\'t Find What You\'re Looking For?') ?></h2>
             <p class="text-[#9d8f82] text-sm leading-6 mb-6">
-                INVEZ มีเครือข่ายกว่า 27 ประเภทอสังหาริมทรัพย์ ติดต่อเราเพื่อหาทรัพย์ที่ตรงโจทย์
+                <?= t('INVEZ มีเครือข่ายกว่า 27 ประเภทอสังหาริมทรัพย์ ติดต่อเราเพื่อหาทรัพย์ที่ตรงโจทย์','INVEZ covers 27+ property types. Contact us to find exactly what you need.') ?>
             </p>
             <a href="/contact"
                class="inline-flex items-center gap-2 bg-[#c9a96e] text-white px-6 py-2.5 rounded text-sm font-medium hover:bg-[#b8965e] transition-colors duration-150">
-                ปรึกษาผู้เชี่ยวชาญ
+                <?= t('ปรึกษาผู้เชี่ยวชาญ','Consult an Expert') ?>
             </a>
         </div>
     </section>

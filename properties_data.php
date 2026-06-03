@@ -288,9 +288,11 @@ $properties = [
     ],
 ];
 
-function get_category_label(array $categories, string $id): string {
+function get_category_label(array $categories, string $id, string $lang = 'th'): string {
     foreach ($categories as $cat) {
-        if ($cat['id'] === $id) return $cat['label'];
+        if ($cat['id'] === $id) {
+            return ($lang === 'en' && !empty($cat['en'])) ? $cat['en'] : $cat['label'];
+        }
     }
     return $id;
 }

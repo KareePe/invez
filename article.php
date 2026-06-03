@@ -1,4 +1,5 @@
 <?php
+require_once('config/lang.php');
 require_once('config/db.php');
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -12,7 +13,9 @@ if (!$article) {
     exit;
 }
 
-$article['points'] = json_decode($article['points'], true) ?? [];
+$article['points']    = json_decode($article['points'], true) ?? [];
+$article['points_en'] = json_decode($article['points_en'], true) ?? [];
+$display_points = (is_en() && !empty($article['points_en'])) ? $article['points_en'] : $article['points'];
 
 $prev_stmt = db()->prepare('SELECT id, category FROM articles WHERE id < ? AND is_active = 1 ORDER BY id DESC LIMIT 1');
 $prev_stmt->execute([$id]);
@@ -32,7 +35,7 @@ $meta_title = htmlspecialchars($article['title']) . ' | INVEZ';
 $meta_desc  = htmlspecialchars($article['excerpt']);
 ?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= lang() ?>">
 
 <head>
     <meta charset="UTF-8" />
@@ -77,17 +80,17 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
 
             <!-- Breadcrumb -->
             <nav class="flex items-center gap-1.5 text-xs text-[#9d8f82] mb-6" aria-label="breadcrumb">
-                <a href="/content" class="hover:text-[#1a1714] transition-colors">คอนเทนท์</a>
+                <a href="/content" class="hover:text-[#1a1714] transition-colors"><?= t('คอนเทนท์','Content') ?></a>
                 <span>/</span>
                 <span class="text-[#1a1714]"><?= htmlspecialchars($article['category']) ?></span>
             </nav>
 
             <div class="fade-up">
                 <h1 class="text-2xl md:text-3xl font-semibold text-[#1a1714] leading-snug mb-3">
-                    <?= htmlspecialchars($article['title']) ?>
+                    <?= htmlspecialchars(tf($article, 'title')) ?>
                 </h1>
                 <?php if (!empty($article['excerpt'])): ?>
-                <p class="text-[#6b5f52] text-sm leading-6"><?= htmlspecialchars($article['excerpt']) ?></p>
+                <p class="text-[#6b5f52] text-sm leading-6"><?= htmlspecialchars(tf($article, 'excerpt')) ?></p>
                 <?php endif; ?>
             </div>
 
@@ -102,15 +105,15 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
             <?php if (!empty($article['intro'])): ?>
             <div class="mb-10 pb-10 border-b border-[#e8e4df]">
                 <p class="text-[#5a4e42] text-base leading-8">
-                    <?= htmlspecialchars($article['intro']) ?>
+                    <?= htmlspecialchars(tf($article, 'intro')) ?>
                 </p>
             </div>
             <?php endif; ?>
 
             <!-- Key Points -->
-            <?php if (!empty($article['points'])): ?>
+            <?php if (!empty($display_points)): ?>
             <div class="space-y-4">
-                <?php foreach ($article['points'] as $i => $point): ?>
+                <?php foreach ($display_points as $i => $point): ?>
                 <div class="flex gap-4 items-start py-5 border-b border-[#f0ebe3] last:border-0">
                     <span class="w-6 h-6 rounded-full bg-[#c9a96e] text-white flex items-center justify-center text-[11px] font-semibold flex-shrink-0 mt-0.5"><?= $i + 1 ?></span>
                     <div class="flex-1 min-w-0">
@@ -145,7 +148,7 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
 
             <a href="/content"
                 class="flex-shrink-0 text-xs text-[#9d8f82] hover:text-[#1a1714] transition-colors duration-150 border border-[#e8e4df] hover:border-[#1a1714] px-4 py-1.5 rounded">
-                ดูทั้งหมด
+                <?= t('ดูทั้งหมด','View All') ?>
             </a>
 
             <?php if ($next): ?>
@@ -164,7 +167,7 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
     <!-- Related articles -->
     <section class="py-10 md:py-14 px-6 bg-white border-t border-[#e8e4df]">
         <div class="max-w-3xl mx-auto">
-            <h2 class="text-sm font-semibold text-[#1a1714] mb-5">บทความที่เกี่ยวข้อง</h2>
+            <h2 class="text-sm font-semibold text-[#1a1714] mb-5"><?= t('บทความที่เกี่ยวข้อง','Related Articles') ?></h2>
             <div class="grid sm:grid-cols-3 gap-3">
                 <?php foreach ($related as $r): ?>
                 <a href="/article/<?= $r['id'] ?>"
@@ -187,11 +190,11 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
     <!-- CTA -->
     <section class="py-14 px-6 bg-[#1a1714]">
         <div class="max-w-2xl mx-auto text-center">
-            <h2 class="text-lg font-semibold text-white mb-2">สนใจทรัพย์สินประเภทนี้?</h2>
-            <p class="text-[#9d8f82] text-sm leading-6 mb-6">ทีมงาน INVEZ พร้อมให้คำปรึกษาและจับคู่ดีลที่ตรงโจทย์ให้คุณ</p>
+            <h2 class="text-lg font-semibold text-white mb-2"><?= t('สนใจทรัพย์สินประเภทนี้?','Interested in This Property Type?') ?></h2>
+            <p class="text-[#9d8f82] text-sm leading-6 mb-6"><?= t('ทีมงาน INVEZ พร้อมให้คำปรึกษาและจับคู่ดีลที่ตรงโจทย์ให้คุณ','The INVEZ team is ready to advise and match the right deal for you.') ?></p>
             <a href="/contact"
                 class="inline-flex items-center gap-2 bg-[#c9a96e] text-white px-6 py-2.5 rounded text-sm font-medium hover:bg-[#b8965e] transition-colors duration-150">
-                ติดต่อเรา
+                <?= t('ติดต่อเรา','Contact Us') ?>
             </a>
         </div>
     </section>
