@@ -24,6 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($first_name === '') $errors[] = t('กรุณากรอกชื่อ', 'Please enter first name');
     if ($last_name  === '') $errors[] = t('กรุณากรอกนามสกุล', 'Please enter last name');
+    if ($phone !== '' && !preg_match('/^\+?[0-9\-\s]{7,20}$/', $phone)) {
+        $errors[] = t('รูปแบบเบอร์โทรไม่ถูกต้อง', 'Invalid phone number format');
+    }
     if ($email === '') {
         $errors[] = t('กรุณากรอกอีเมล', 'Please enter email');
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {

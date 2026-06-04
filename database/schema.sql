@@ -8,6 +8,18 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Tables
 -- -------------------------------------------------------
 
+CREATE TABLE IF NOT EXISTS `members` (
+  `id`            INT AUTO_INCREMENT PRIMARY KEY,
+  `first_name`    VARCHAR(100) NOT NULL,
+  `last_name`     VARCHAR(100) NOT NULL,
+  `phone`         VARCHAR(20)  DEFAULT NULL,
+  `email`         VARCHAR(255) UNIQUE NOT NULL,
+  `username`      VARCHAR(50)  UNIQUE NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `status`        VARCHAR(20)  NOT NULL DEFAULT 'pending',
+  `created_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `admins` (
   `id`         INT AUTO_INCREMENT PRIMARY KEY,
   `username`   VARCHAR(50)  UNIQUE NOT NULL,
@@ -36,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `properties` (
   `description`    TEXT         DEFAULT NULL,
   `sort_order`     INT          DEFAULT 0,
   `is_active`      TINYINT(1)   DEFAULT 1,
+  `token`          VARCHAR(32)  UNIQUE DEFAULT NULL,
   `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -54,6 +67,19 @@ CREATE TABLE IF NOT EXISTS `property_images` (
   `filename`    VARCHAR(255) NOT NULL,
   `sort_order`  INT          DEFAULT 0,
   FOREIGN KEY (`property_id`) REFERENCES `properties`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `property_interests` (
+  `id`             INT AUTO_INCREMENT PRIMARY KEY,
+  `transaction_id` CHAR(36)         UNIQUE DEFAULT NULL,
+  `member_id`      INT              NOT NULL,
+  `property_id`    INT              NOT NULL,
+  `amount_percent` TINYINT UNSIGNED NOT NULL,
+  `amount_value`   BIGINT           NOT NULL,
+  `bank`           VARCHAR(10)      NOT NULL,
+  `status`         VARCHAR(20)      NOT NULL DEFAULT 'pending',
+  `slip_filename`  VARCHAR(255)     DEFAULT NULL,
+  `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `articles` (

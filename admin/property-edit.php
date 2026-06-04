@@ -87,6 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
             $stmt->execute($fields);
             $id = (int)db()->lastInsertId();
+            db()->prepare("UPDATE properties SET token = ? WHERE id = ? AND token IS NULL")
+                ->execute([bin2hex(random_bytes(16)), $id]);
         } else {
             $stmt = db()->prepare(
                 'UPDATE properties SET

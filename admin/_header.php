@@ -9,6 +9,7 @@ function _nav_active(string $group): string {
         'portfolios' => ['portfolios', 'portfolio-edit', 'portfolio-delete'],
         'articles'   => ['articles', 'article-edit', 'article-delete'],
         'members'    => ['members', 'member-status'],
+        'interests'  => ['interests', 'interest-status'],
         'admins'     => ['admins', 'admin-edit', 'admin-delete'],
     ];
     return in_array($_current, $groups[$group] ?? [], true)
@@ -121,6 +122,16 @@ function _nav_active(string $group): string {
             if ($pending_count > 0):
             ?>
             <span class="ml-auto bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"><?= $pending_count ?></span>
+            <?php endif; ?>
+        </a>
+        <a href="interests" class="sidebar-link <?= _nav_active('interests') ?>">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            คำสั่งซื้อ
+            <?php
+            $interest_pending = db()->query("SELECT COUNT(*) FROM property_interests WHERE status = 'pending' AND slip_filename IS NOT NULL")->fetchColumn();
+            if ($interest_pending > 0):
+            ?>
+            <span class="ml-auto bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"><?= $interest_pending ?></span>
             <?php endif; ?>
         </a>
         <a href="admins" class="sidebar-link <?= _nav_active('admins') ?>">

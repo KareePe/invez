@@ -8,9 +8,18 @@ if (!empty($_SESSION['member_id'])) {
     exit;
 }
 
+if (empty($_SESSION['_login_csrf'])) {
+    $_SESSION['_login_csrf'] = bin2hex(random_bytes(32));
+}
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['_login_csrf']) || !hash_equals($_SESSION['_login_csrf'], $_POST['_login_csrf'])) {
+        http_response_code(403);
+        die('Invalid request');
+    }
+
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
@@ -34,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['member_id']       = $member['id'];
             $_SESSION['member_name']     = $member['first_name'] . ' ' . $member['last_name'];
             $_SESSION['member_username'] = $member['username'];
-            header('Location: member/index.php');
+            header('Location: /member');
             exit;
         }
     }
@@ -72,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="bg-white rounded-xl border border-[#e8e4df] p-8">
                 <form method="POST" class="space-y-4">
+                    <input type="hidden" name="_login_csrf" value="<?= htmlspecialchars($_SESSION['_login_csrf']) ?>">
 
                     <div>
                         <label class="block text-xs font-medium text-[#6b5f52] mb-1.5"><?= t('ชื่อผู้ใช้งาน หรือ อีเมล','Username or Email') ?></label>

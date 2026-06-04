@@ -59,6 +59,10 @@ function _mnav(string $page): string {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             <?= function_exists('t') ? t('ลงทรัพย์สิน','Submit Property') : 'ลงทรัพย์สิน' ?>
         </a>
+        <a href="orders" class="mnav-link <?= _mnav('orders') ?>">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <?= function_exists('t') ? t('คำสั่งซื้อ','My Orders') : 'คำสั่งซื้อ' ?>
+        </a>
     </nav>
     <div class="px-3 py-3 border-t border-[#e8e4df]">
         <div class="text-xs text-[#9d8f82] px-3 mb-1 truncate"><?= htmlspecialchars($_member_name) ?></div>

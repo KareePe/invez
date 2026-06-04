@@ -14,6 +14,16 @@ if (!$p) {
     exit;
 }
 
+// Lazy-generate checkout token for properties that don't have one yet
+if (empty($p['token'])) {
+    $tok = bin2hex(random_bytes(16));
+    try {
+        $u = db()->prepare("UPDATE properties SET token = ? WHERE id = ? AND token IS NULL");
+        $u->execute([$tok, $id]);
+        $p['token'] = $tok;
+    } catch (\PDOException $e) {}
+}
+
 $h_stmt = db()->prepare('SELECT content, content_en FROM property_highlights WHERE property_id = ? ORDER BY sort_order ASC');
 $h_stmt->execute([$id]);
 $p['highlights'] = $h_stmt->fetchAll();
@@ -168,6 +178,17 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
                 </div>
                 <?php endif; ?>
             </div>
+
+            <!-- Interest button -->
+            <?php if (!empty($p['price'])): ?>
+            <div class="mt-4 mb-6">
+                <a href="/checkout/<?= htmlspecialchars($p['token'] ?? '') ?>"
+                   class="inline-flex items-center gap-2 bg-[#c9a96e] hover:bg-[#b8965e] text-white px-6 py-2.5 rounded text-sm font-medium transition-colors duration-150">
+                    <?= t('สนใจทรัพย์สินนี้', 'Interested in This Property') ?>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+            <?php endif; ?>
 
             <!-- Share -->
             <div class="flex flex-wrap items-center gap-2 mb-8">

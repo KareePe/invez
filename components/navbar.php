@@ -7,7 +7,7 @@ require_once(__DIR__ . '/../config/lang.php');
 <nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300
     <?= $navbar_dark
         ? 'border-transparent'
-        : 'bg-white/96 backdrop-blur-sm border-b border-[#e8e4df]' ?>"
+        : 'bg-[#fff]/70 backdrop-blur-md border-b border-[#e8e4df]' ?>"
     <?= $navbar_dark ? 'style="background-color:rgba(0,0,0,0.35);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"' : '' ?>>
     <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
 
@@ -21,12 +21,15 @@ require_once(__DIR__ . '/../config/lang.php');
 
         <div class="flex items-center gap-3">
             <!-- Desktop nav -->
-            <div class="hidden md:flex items-center gap-7 text-sm">
+            <div class="hidden min-[991px]:flex items-center gap-7 text-sm">
                 <?php
                 $link_base   = $navbar_dark ? 'text-white/70 hover:text-white' : 'text-[#6b5f52] hover:text-[#1a1714]';
                 $link_active = $navbar_dark ? 'text-white font-medium'          : 'text-[#1a1714] font-medium';
-                $btn_class   = $navbar_dark
+                $btn_outlined = $navbar_dark
                     ? 'border border-white/40 text-white hover:bg-white hover:text-[#1a1714]'
+                    : 'border border-[#1a1714] text-[#1a1714] hover:bg-[#1a1714] hover:text-white';
+                $btn_solid   = $navbar_dark
+                    ? 'bg-white text-[#1a1714] hover:bg-white/90'
                     : 'bg-[#1a1714] text-white hover:bg-[#2d2520]';
                 ?>
                 <a href="/" class="nav-link <?= $current_page === 'home'       ? $link_active : $link_base ?> transition-colors duration-150"><?= t('หน้าแรก','Home') ?></a>
@@ -34,6 +37,22 @@ require_once(__DIR__ . '/../config/lang.php');
                 <a href="/properties" class="nav-link <?= $current_page === 'properties' ? $link_active : $link_base ?> transition-colors duration-150"><?= t('ทรัพย์สิน','Properties') ?></a>
                 <a href="/portfolio" class="nav-link <?= $current_page === 'portfolio' ? $link_active : $link_base ?> transition-colors duration-150"><?= t('ผลงาน','Portfolio') ?></a>
                 <a href="/content" class="nav-link <?= $current_page === 'content' ? $link_active : $link_base ?> transition-colors duration-150"><?= t('คอนเทนท์','Content') ?></a>
+                <a href="/contact" class="nav-btn px-4 py-1.5 rounded text-sm transition-colors duration-150 <?= $btn_outlined ?>"><?= t('ติดต่อเรา','Contact') ?></a>
+                <!-- Member area desktop -->
+                <?php if (!empty($_SESSION['member_id'])): ?>
+                <div class="relative" id="member-dropdown-wrap">
+                    <button id="member-dropdown-btn" class="member-btn flex items-center gap-1 text-xs <?= $navbar_dark ? 'text-white/70 hover:text-white' : 'text-[#6b5f52] hover:text-[#1a1714]' ?> transition-colors">
+                        <span class="max-w-[80px] truncate"><?= htmlspecialchars($_SESSION['member_name'] ?? '') ?></span>
+                        <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div id="member-dropdown" class="hidden absolute right-0 top-full mt-2 w-44 rounded-md shadow-md bg-white border border-[#e8e4df] py-1 z-50">
+                        <a href="/member" class="block px-4 py-2 text-xs text-[#6b5f52] hover:bg-[#f5f3f0] hover:text-[#1a1714] transition-colors"><?= t('พื้นที่สมาชิก','Member Area') ?></a>
+                        <a href="/logout" class="block px-4 py-2 text-xs text-[#6b5f52] hover:bg-[#f5f3f0] hover:text-[#1a1714] transition-colors"><?= t('ออกจากระบบ','Logout') ?></a>
+                    </div>
+                </div>
+                <?php else: ?>
+                <a href="/login" class="nav-btn-login px-4 py-1.5 rounded text-sm transition-colors duration-150 <?= $btn_solid ?>"><?= t('เข้าสู่ระบบ','Login') ?></a>
+                <?php endif; ?>
                 <!-- Language toggle desktop -->
                 <div class="lang-toggle flex items-center text-[10px] font-semibold tracking-wider gap-0.5">
                     <a href="/lang?set=th" data-lang="th"
@@ -48,20 +67,10 @@ require_once(__DIR__ . '/../config/lang.php');
                                 ? ($navbar_dark ? 'text-white' : 'text-[#1a1714]')
                                 : ($navbar_dark ? 'text-white/35 hover:text-white/60' : 'text-[#9d8f82] hover:text-[#6b5f52]') ?>">EN</a>
                 </div>
-                <a href="/contact" class="nav-btn px-4 py-1.5 rounded text-sm transition-colors duration-150 <?= $btn_class ?>"><?= t('ติดต่อเรา','Contact') ?></a>
-                <!-- Member area desktop -->
-                <?php if (!empty($_SESSION['member_id'])): ?>
-                <div class="flex items-center gap-2 text-xs <?= $navbar_dark ? 'text-white/60' : 'text-[#9d8f82]' ?>">
-                    <span class="max-w-[80px] truncate"><?= htmlspecialchars($_SESSION['member_name'] ?? '') ?></span>
-                    <a href="/logout" class="hover:<?= $navbar_dark ? 'text-white' : 'text-[#1a1714]' ?> transition-colors"><?= t('ออก','Logout') ?></a>
-                </div>
-                <?php else: ?>
-                <a href="/login" class="text-xs <?= $navbar_dark ? 'text-white/60 hover:text-white' : 'text-[#9d8f82] hover:text-[#1a1714]' ?> transition-colors"><?= t('เข้าสู่ระบบ','Login') ?></a>
-                <?php endif; ?>
             </div>
 
             <!-- Mobile hamburger -->
-            <button id="nav-toggle" class="md:hidden p-1 <?= $navbar_dark ? 'text-white' : 'text-[#1a1714]' ?>" aria-label="เมนู">
+            <button id="nav-toggle" class="min-[991px]:hidden p-1 <?= $navbar_dark ? 'text-white' : 'text-[#1a1714]' ?>" aria-label="เมนู">
                 <i id="icon-menu" data-feather="menu"></i>
                 <i id="icon-x" data-feather="x" class="hidden"></i>
             </button>
@@ -69,7 +78,7 @@ require_once(__DIR__ . '/../config/lang.php');
     </div>
 
     <!-- Mobile menu -->
-    <div id="mobile-menu" class="hidden md:hidden border-t <?= $navbar_dark ? 'border-white/10 bg-black/80 backdrop-blur-md' : 'border-[#e8e4df] bg-white' ?>">
+    <div id="mobile-menu" class="hidden min-[991px]:hidden border-t <?= $navbar_dark ? 'border-white/10 bg-black/80 backdrop-blur-md' : 'border-[#e8e4df] bg-white' ?>">
         <div class="flex flex-col px-6 py-4 gap-4 text-sm <?= $navbar_dark ? 'text-white/70' : 'text-[#6b5f52]' ?>">
             <a href="/" class="hover:text-<?= $navbar_dark ? 'white' : '[#1a1714]' ?> transition-colors"><?= t('หน้าแรก','Home') ?></a>
             <a href="/about" class="hover:text-<?= $navbar_dark ? 'white' : '[#1a1714]' ?> transition-colors"><?= t('เกี่ยวกับเรา','About') ?></a>
@@ -79,9 +88,10 @@ require_once(__DIR__ . '/../config/lang.php');
             <a href="/contact" class="<?= $navbar_dark ? 'text-white font-medium' : 'text-[#1a1714] font-medium' ?>"><?= t('ติดต่อเรา','Contact') ?></a>
             <!-- Member mobile -->
             <?php if (!empty($_SESSION['member_id'])): ?>
-            <div class="flex items-center justify-between text-xs pt-1">
-                <span class="<?= $navbar_dark ? 'text-white/50' : 'text-[#9d8f82]' ?>"><?= htmlspecialchars($_SESSION['member_name'] ?? '') ?></span>
-                <a href="/logout" class="<?= $navbar_dark ? 'text-white/60 hover:text-white' : 'text-[#9d8f82] hover:text-[#1a1714]' ?> transition-colors"><?= t('ออกจากระบบ','Logout') ?></a>
+            <div class="flex flex-col gap-2 pt-2 border-t <?= $navbar_dark ? 'border-white/10' : 'border-[#e8e4df]' ?>">
+                <span class="text-xs font-medium <?= $navbar_dark ? 'text-white/50' : 'text-[#9d8f82]' ?>"><?= htmlspecialchars($_SESSION['member_name'] ?? '') ?></span>
+                <a href="/member" class="text-xs <?= $navbar_dark ? 'text-white/60 hover:text-white' : 'text-[#6b5f52] hover:text-[#1a1714]' ?> transition-colors"><?= t('พื้นที่สมาชิก','Member Area') ?></a>
+                <a href="/logout" class="text-xs <?= $navbar_dark ? 'text-white/60 hover:text-white' : 'text-[#6b5f52] hover:text-[#1a1714]' ?> transition-colors"><?= t('ออกจากระบบ','Logout') ?></a>
             </div>
             <?php else: ?>
             <div class="flex items-center gap-3 text-xs pt-1">
@@ -111,7 +121,8 @@ require_once(__DIR__ . '/../config/lang.php');
     const nav             = document.getElementById('main-nav');
     const logo            = document.getElementById('nav-logo');
     const links           = nav.querySelectorAll('.nav-link');
-    const btn             = nav.querySelector('.nav-btn');
+    const btn             = nav.querySelector('.nav-btn');       // contact (outlined)
+        const loginBtn        = nav.querySelector('.nav-btn-login'); // login (solid)
     const langLinks       = nav.querySelectorAll('.lang-toggle a');
     const langSep         = nav.querySelector('.lang-toggle span');
     const currentLang     = '<?= lang() ?>';
@@ -133,11 +144,17 @@ require_once(__DIR__ . '/../config/lang.php');
         }
 
         links.forEach(l => { l.style.color = solid ? '#6b5f52' : 'rgba(255,255,255,0.75)'; });
+        const memberBtn = nav.querySelector('.member-btn');
+        if (memberBtn) memberBtn.style.color = solid ? '#6b5f52' : 'rgba(255,255,255,0.7)';
 
         if (btn) {
-            btn.style.backgroundColor = solid ? '#1a1714'     : 'transparent';
-            btn.style.color           = '#ffffff';
-            btn.style.borderColor     = solid ? 'transparent' : 'rgba(255,255,255,0.4)';
+            btn.style.backgroundColor = 'transparent';
+            btn.style.color           = solid ? '#1a1714' : '#ffffff';
+            btn.style.borderColor     = solid ? '#1a1714' : 'rgba(255,255,255,0.4)';
+        }
+        if (loginBtn) {
+            loginBtn.style.backgroundColor = solid ? '#1a1714' : '#ffffff';
+            loginBtn.style.color           = solid ? '#ffffff' : '#1a1714';
         }
 
         langLinks.forEach(a => {
@@ -160,4 +177,15 @@ require_once(__DIR__ . '/../config/lang.php');
         document.getElementById('icon-menu').classList.toggle('hidden');
         document.getElementById('icon-x').classList.toggle('hidden');
     });
+
+    (function () {
+        const btn  = document.getElementById('member-dropdown-btn');
+        const menu = document.getElementById('member-dropdown');
+        if (!btn || !menu) return;
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('hidden');
+        });
+        document.addEventListener('click', () => menu.classList.add('hidden'));
+    }());
 </script>
