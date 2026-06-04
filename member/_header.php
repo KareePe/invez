@@ -28,6 +28,7 @@ function _mnav(string $page): string {
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        body { font-family: 'Prompt', sans-serif; }
         .mnav-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; font-size:14px; transition:all .15s; }
         .swal-popup { border-radius:8px!important;padding:24px!important;max-width:360px!important;font-family:inherit!important; }
         .swal-confirm { background:#dc2626!important;color:#fff!important;border-radius:6px!important;font-size:13px!important;font-weight:500!important;padding:6px 14px!important;box-shadow:none!important; }
@@ -66,6 +67,10 @@ function _mnav(string $page): string {
     </nav>
     <div class="px-3 py-3 border-t border-[#e8e4df]">
         <div class="text-xs text-[#9d8f82] px-3 mb-1 truncate"><?= htmlspecialchars($_member_name) ?></div>
+        <a href="../" class="mnav-link text-[#9d8f82] hover:bg-[#f5f3f0] hover:text-[#1a1714]">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <?= function_exists('t') ? t('กลับหน้าหลัก','Main Site') : 'กลับหน้าหลัก' ?>
+        </a>
         <a href="../logout" class="mnav-link text-[#9d8f82] hover:bg-[#f5f3f0] hover:text-[#1a1714]">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             <?= function_exists('t') ? t('ออกจากระบบ','Logout') : 'ออกจากระบบ' ?>
