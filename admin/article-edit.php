@@ -118,6 +118,17 @@ include('_header.php');
 
     <div class="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
         <h3 class="font-semibold text-gray-700 text-sm">ข้อมูลบทความ</h3>
+        <?php
+        $feather_icons = [
+            'file-text','key','home','activity','book-open','layers','tool',
+            'package','map','briefcase','star','music','smile','radio','anchor',
+            'navigation','git-merge','edit-3','sun','feather','flag','truck',
+            'battery-charging','zap','shopping-bag','monitor','camera','server',
+            'trending-up','dollar-sign','bar-chart-2','globe','heart','shield',
+            'award','users','tag','cpu','database','building',
+        ];
+        $cur_icon = htmlspecialchars($article['icon'] ?? 'file-text');
+        ?>
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">หมวดหมู่ *</label>
@@ -125,11 +136,28 @@ include('_header.php');
                        placeholder="เช่น โรงแรม, คอนโด"
                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]" required>
             </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Icon (Feather icon name)</label>
-                <input type="text" name="icon" value="<?= htmlspecialchars($article['icon'] ?? 'file-text') ?>"
-                       placeholder="เช่น key, home, activity"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+            <div class="relative">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Icon</label>
+                <input type="hidden" name="icon" id="icon-value" value="<?= $cur_icon ?>">
+                <button type="button" id="icon-picker-btn"
+                        class="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 text-sm w-full bg-white hover:border-[#c9a96e] transition-colors text-left">
+                    <i data-feather="<?= $cur_icon ?>" class="w-4 h-4 flex-shrink-0"></i>
+                    <span id="icon-label" class="flex-1 truncate"><?= $cur_icon ?></span>
+                    <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div id="icon-dropdown"
+                     class="hidden absolute z-30 mt-1 left-0 bg-white border border-gray-200 rounded-xl shadow-lg p-3"
+                     style="width:320px">
+                    <div class="grid grid-cols-8 gap-1">
+                        <?php foreach ($feather_icons as $ic): ?>
+                        <button type="button" data-icon="<?= $ic ?>"
+                                title="<?= $ic ?>"
+                                class="icon-opt flex items-center justify-center w-9 h-9 rounded-lg hover:bg-amber-50 transition-colors <?= $ic === ($article['icon'] ?? 'file-text') ? 'bg-amber-50 ring-1 ring-[#c9a96e]' : '' ?>">
+                            <i data-feather="<?= $ic ?>" class="w-4 h-4"></i>
+                        </button>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- TH fields -->
@@ -244,7 +272,38 @@ include('_header.php');
     </div>
 </form>
 
+<script src="https://unpkg.com/feather-icons"></script>
 <script>
+feather.replace({ width: 16, height: 16 });
+
+const btn      = document.getElementById('icon-picker-btn');
+const dropdown = document.getElementById('icon-dropdown');
+const hidden   = document.getElementById('icon-value');
+const label    = document.getElementById('icon-label');
+
+btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('hidden');
+});
+document.addEventListener('click', () => dropdown.classList.add('hidden'));
+dropdown.addEventListener('click', (e) => e.stopPropagation());
+
+document.querySelectorAll('.icon-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+        const ic = opt.dataset.icon;
+        hidden.value = ic;
+        label.textContent = ic;
+        const iconEl = btn.querySelector('svg:first-child, i[data-feather]');
+        if (iconEl) {
+            iconEl.outerHTML = `<i data-feather="${ic}" class="w-4 h-4 flex-shrink-0"></i>`;
+            feather.replace({ width: 16, height: 16 });
+        }
+        document.querySelectorAll('.icon-opt').forEach(o => o.classList.remove('bg-amber-50','ring-1','ring-[#c9a96e]'));
+        opt.classList.add('bg-amber-50','ring-1','ring-[#c9a96e]');
+        dropdown.classList.add('hidden');
+    });
+});
+
 function addPoint(lang) {
     const isEn = lang === 'en';
     const tpl = `<div class="border border-gray-200 rounded-lg p-4 space-y-2 relative point-row">
