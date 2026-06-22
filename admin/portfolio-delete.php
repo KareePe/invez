@@ -15,6 +15,10 @@ if ($id < 1) {
     exit;
 }
 
+$port_label = db()->prepare('SELECT title FROM portfolios WHERE id = ?');
+$port_label->execute([$id]);
+$port_label = (string)($port_label->fetchColumn() ?: '');
+
 // Delete image files
 $imgs = db()->prepare('SELECT filename FROM portfolio_images WHERE portfolio_id = ?');
 $imgs->execute([$id]);
@@ -30,6 +34,7 @@ if (is_dir($dir)) @rmdir($dir);
 db()->prepare('DELETE FROM portfolio_images WHERE portfolio_id = ?')->execute([$id]);
 db()->prepare('DELETE FROM portfolios WHERE id = ?')->execute([$id]);
 
+log_admin_activity('delete', 'portfolio', $id, $port_label);
 flash('success', 'ลบผลงานสำเร็จ');
 header('Location: portfolios');
 exit;

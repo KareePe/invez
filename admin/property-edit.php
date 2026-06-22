@@ -159,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        log_admin_activity($is_new ? 'create' : 'update', 'property', $id, $title);
         flash('success', $is_new ? 'เพิ่มทรัพย์สินสำเร็จ' : 'บันทึกทรัพย์สินสำเร็จ');
         header('Location: properties');
         exit;

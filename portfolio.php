@@ -93,7 +93,8 @@ $total = count($portfolios);
                                  class="<?= $img_count > 1
                                      ? ('absolute inset-0 w-full h-full object-cover transition-opacity duration-300' . ($idx !== 0 ? ' opacity-0' : ''))
                                      : 'w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500' ?>"
-                                 <?= $img_count > 1 ? 'data-slide="'.$idx.'"' : '' ?>>
+                                 <?= $img_count > 1 ? 'data-slide="'.$idx.'"' : '' ?>
+                                 loading="lazy">
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="w-full h-full flex items-center justify-center">

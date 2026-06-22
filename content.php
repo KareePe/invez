@@ -63,7 +63,7 @@ foreach ($rows as $row) {
     <section class="py-12 md:py-16 px-6 bg-white">
         <div class="max-w-6xl mx-auto">
 
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="article-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <?php foreach ($articles as $id => $article): ?>
                 <a href="/article/<?= $id ?>"
                     class="bg-white rounded-lg border border-[#e8e4df] hover:border-[#c9a96e] transition-colors duration-150 flex flex-col overflow-hidden group">
@@ -93,6 +93,15 @@ foreach ($rows as $row) {
 
                 </a>
                 <?php endforeach; ?>
+            </div>
+
+            <div class="flex justify-center gap-3 mt-8">
+                <button type="button" id="load-more-articles" class="hidden px-6 py-2.5 rounded text-sm font-medium border border-[#e8e4df] text-[#1a1714] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors duration-150">
+                    <?= t('แสดงเพิ่มเติม','Load More') ?>
+                </button>
+                <button type="button" id="show-less-articles" class="hidden px-6 py-2.5 rounded text-sm font-medium border border-[#e8e4df] text-[#6b5f52] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors duration-150">
+                    <?= t('แสดงน้อยลง','Show Less') ?>
+                </button>
             </div>
         </div>
     </section>
@@ -124,6 +133,27 @@ foreach ($rows as $row) {
         window.addEventListener('load', () => {
             setTimeout(() => document.getElementById('preloader').classList.add('hide'), 400);
         });
+
+        (function () {
+            const PAGE_SIZE = 9, STEP = 3;
+            const grid = document.getElementById('article-grid');
+            const cards = Array.from(document.querySelectorAll('#article-grid > a'));
+            const moreBtn = document.getElementById('load-more-articles');
+            const lessBtn = document.getElementById('show-less-articles');
+            let shown = PAGE_SIZE;
+            function render() {
+                cards.forEach((card, i) => card.classList.toggle('hidden', i >= shown));
+                moreBtn.classList.toggle('hidden', shown >= cards.length);
+                lessBtn.classList.toggle('hidden', shown <= PAGE_SIZE);
+            }
+            moreBtn?.addEventListener('click', () => { shown += STEP; render(); });
+            lessBtn?.addEventListener('click', () => {
+                shown = PAGE_SIZE;
+                render();
+                grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            render();
+        })();
     </script>
 </body>
 </html>

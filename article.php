@@ -49,6 +49,7 @@ $meta_desc  = htmlspecialchars($article['excerpt']);
     <meta property="og:title" content="<?= $meta_title ?>" />
     <meta property="og:description" content="<?= $meta_desc ?>" />
     <meta property="og:url" content="https://www.invez.biz/article/<?= $id ?>" />
+    <meta property="og:image" content="https://www.invez.biz/assets/images/S__24510480.jpg" />
     <meta property="og:site_name" content="INVEZ" />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />

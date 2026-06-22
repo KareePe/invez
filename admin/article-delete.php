@@ -15,8 +15,13 @@ if ($id < 1) {
     exit;
 }
 
+$art_label = db()->prepare('SELECT title FROM articles WHERE id = ?');
+$art_label->execute([$id]);
+$art_label = (string)($art_label->fetchColumn() ?: '');
+
 db()->prepare('DELETE FROM articles WHERE id = ?')->execute([$id]);
 
+log_admin_activity('delete', 'article', $id, $art_label);
 flash('success', 'ลบบทความสำเร็จ');
 header('Location: articles');
 exit;

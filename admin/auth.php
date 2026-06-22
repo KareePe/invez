@@ -42,6 +42,23 @@ function flash(string $type, string $msg): void {
     $_SESSION['flash'][$type] = $msg;
 }
 
+function log_admin_activity(string $action, string $entity, int $entity_id, string $label = ''): void {
+    try {
+        db()->prepare(
+            'INSERT INTO admin_activity_log (admin_id, admin_name, action, entity, entity_id, label) VALUES (?,?,?,?,?,?)'
+        )->execute([
+            $_SESSION['admin_id'] ?? 0,
+            $_SESSION['admin_name'] ?? '',
+            $action,
+            $entity,
+            $entity_id,
+            mb_substr($label, 0, 255),
+        ]);
+    } catch (Throwable $e) {
+        error_log('log_admin_activity failed: ' . $e->getMessage());
+    }
+}
+
 function admin_pagination(int $total, int $per_page, int $page, string $base_url): string {
     $pages = max(1, (int)ceil($total / $per_page));
     if ($pages <= 1) return '';

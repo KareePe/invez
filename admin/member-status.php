@@ -17,14 +17,21 @@ if ($id < 1 || !in_array($action, ['approve', 'reject', 'delete'], true)) {
     exit;
 }
 
+$member_label = db()->prepare('SELECT CONCAT(first_name," ",last_name) FROM members WHERE id = ?');
+$member_label->execute([$id]);
+$member_label = (string)($member_label->fetchColumn() ?: '');
+
 if ($action === 'delete') {
     db()->prepare('DELETE FROM members WHERE id = ?')->execute([$id]);
+    log_admin_activity('delete', 'member', $id, $member_label);
     flash('success', 'ลบสมาชิกสำเร็จ');
 } elseif ($action === 'approve') {
     db()->prepare("UPDATE members SET status = 'approved' WHERE id = ?")->execute([$id]);
+    log_admin_activity('update', 'member', $id, $member_label . ' (อนุมัติ)');
     flash('success', 'อนุมัติสมาชิกสำเร็จ');
 } elseif ($action === 'reject') {
     db()->prepare("UPDATE members SET status = 'rejected' WHERE id = ?")->execute([$id]);
+    log_admin_activity('update', 'member', $id, $member_label . ' (ปฏิเสธ)');
     flash('success', 'ปฏิเสธสมาชิกสำเร็จ');
 }
 

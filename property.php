@@ -35,7 +35,7 @@ $p['images'] = $i_stmt->fetchAll(PDO::FETCH_COLUMN);
 $current_page = 'properties';
 $cat_label = get_category_label($property_categories, $p['category'], lang());
 $cat_icon  = get_category_icon($property_categories, $p['category']);
-$cover     = !empty($p['images']) ? 'assets/images/properties/'.$id.'/'.$p['images'][0] : null;
+$cover     = !empty($p['images']) ? 'assets/images/properties/'.$id.'/'.$p['images'][0] : 'assets/images/S__24510480.jpg';
 
 $meta_title = htmlspecialchars($p['title']) . ' | INVEZ';
 $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
@@ -55,9 +55,7 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <meta property="og:title" content="<?= $meta_title ?>" />
     <meta property="og:description" content="<?= mb_substr($meta_desc, 0, 160) ?>" />
     <meta property="og:url" content="https://www.invez.biz/property/<?= $id ?>" />
-    <?php if ($cover): ?>
     <meta property="og:image" content="https://www.invez.biz/<?= htmlspecialchars($cover) ?>" />
-    <?php endif; ?>
     <meta property="og:site_name" content="INVEZ" />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
@@ -137,10 +135,10 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             <div class="mb-8">
                 <div class="swiper rounded-lg border border-[#e8e4df] bg-[#f5f3f0] touch-manipulation" id="prop-slider">
                     <div class="swiper-wrapper">
-                        <?php foreach ($p['images'] as $img): ?>
+                        <?php foreach ($p['images'] as $_i => $img): ?>
                         <div class="swiper-slide">
                             <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
-                                 alt="<?= htmlspecialchars($p['title']) ?>">
+                                 alt="<?= htmlspecialchars($p['title']) ?>"<?= $_i > 0 ? ' loading="lazy"' : '' ?>>
                         </div>
                         <?php endforeach; ?>
                     </div>

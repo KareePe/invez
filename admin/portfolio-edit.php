@@ -108,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        log_admin_activity($is_new ? 'create' : 'update', 'portfolio', $id, $title);
         flash('success', $is_new ? 'เพิ่มผลงานสำเร็จ' : 'บันทึกผลงานสำเร็จ');
         header('Location: portfolios');
         exit;

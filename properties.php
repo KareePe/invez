@@ -109,7 +109,7 @@ $active_cats = array_keys($counts);
             </div>
 
             <!-- Property grid -->
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="property-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <?php foreach ($properties as $p):
                     $images    = !empty($p['images_csv']) ? array_values(array_filter(explode('|', $p['images_csv']))) : [];
                     $cat_label = get_category_label($property_categories, $p['category'], lang());
@@ -127,7 +127,8 @@ $active_cats = array_keys($counts);
                                  class="<?= $img_count > 1
                                      ? ('absolute inset-0 w-full h-full object-cover transition-opacity duration-300' . ($idx !== 0 ? ' opacity-0' : ''))
                                      : 'w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500' ?>"
-                                 <?= $img_count > 1 ? 'data-slide="'.$idx.'"' : '' ?>>
+                                 <?= $img_count > 1 ? 'data-slide="'.$idx.'"' : '' ?>
+                                 loading="lazy">
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="w-full h-full flex items-center justify-center">
@@ -186,6 +187,15 @@ $active_cats = array_keys($counts);
                     </div>
                 </a>
                 <?php endforeach; ?>
+            </div>
+
+            <div class="flex justify-center gap-3 mt-8">
+                <button type="button" id="load-more-properties" class="hidden px-6 py-2.5 rounded text-sm font-medium border border-[#e8e4df] text-[#1a1714] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors duration-150">
+                    <?= t('แสดงเพิ่มเติม','Load More') ?>
+                </button>
+                <button type="button" id="show-less-properties" class="hidden px-6 py-2.5 rounded text-sm font-medium border border-[#e8e4df] text-[#6b5f52] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors duration-150">
+                    <?= t('แสดงน้อยลง','Show Less') ?>
+                </button>
             </div>
 
         </div>
@@ -274,6 +284,27 @@ $active_cats = array_keys($counts);
             }, { passive: true });
             slider.addEventListener('click', e => { if (swiped) { e.preventDefault(); e.stopPropagation(); swiped = false; } });
         });
+
+        (function () {
+            const PAGE_SIZE = 9, STEP = 3;
+            const grid = document.getElementById('property-grid');
+            const cards = Array.from(document.querySelectorAll('#property-grid > a'));
+            const moreBtn = document.getElementById('load-more-properties');
+            const lessBtn = document.getElementById('show-less-properties');
+            let shown = PAGE_SIZE;
+            function render() {
+                cards.forEach((card, i) => card.classList.toggle('hidden', i >= shown));
+                moreBtn.classList.toggle('hidden', shown >= cards.length);
+                lessBtn.classList.toggle('hidden', shown <= PAGE_SIZE);
+            }
+            moreBtn?.addEventListener('click', () => { shown += STEP; render(); });
+            lessBtn?.addEventListener('click', () => {
+                shown = PAGE_SIZE;
+                render();
+                grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            render();
+        })();
     </script>
 </body>
 </html>

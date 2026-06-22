@@ -73,6 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['admin_name'] = $name;
             }
         }
+        $saved_id = $is_new ? (int)db()->lastInsertId() : $id;
+        log_admin_activity($is_new ? 'create' : 'update', 'admin', $saved_id, $name);
         flash('success', $is_new ? 'เพิ่มแอดมินสำเร็จ' : 'บันทึกแอดมินสำเร็จ');
         header('Location: admins');
         exit;

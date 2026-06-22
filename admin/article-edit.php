@@ -82,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$icon ?: 'file-text', $category, $title, $title_en ?: null, $excerpt ?: null, $excerpt_en ?: null, $intro ?: null, $intro_en ?: null, $pts_json, $pts_en_json, $is_active, $id]);
         }
 
+        log_admin_activity($is_new ? 'create' : 'update', 'article', $is_new ? (int)db()->lastInsertId() : $id, $title);
         flash('success', $is_new ? 'เพิ่มบทความสำเร็จ' : 'บันทึกบทความสำเร็จ');
         header('Location: articles');
         exit;
