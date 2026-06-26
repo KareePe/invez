@@ -22,7 +22,7 @@ function db(): PDO {
             );
         } catch (PDOException $e) {
             error_log('DB connection failed: ' . $e->getMessage());
-            die('ไม่สามารถเชื่อมต่อฐานข้อมูลได้ — กรุณาตรวจสอบ config/db.php');
+            die('ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาติดต่อผู้ดูแลระบบ');
         }
     }
     return $pdo;

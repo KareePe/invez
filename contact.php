@@ -1,18 +1,21 @@
-<?php $current_page = 'contact'; ?>
+<?php
+$current_page = 'contact';
+require_once('config/lang.php');
+?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= lang() ?>">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>ติดต่อเรา | INVEZ บริษัท โตโยซัพพลาย จำกัด</title>
-    <meta name="description" content="ติดต่อทีมงาน INVEZ บริษัท โตโยซัพพลาย จำกัด สำนักงานใหญ่จังหวัดอุดรธานี และสาขาปทุมธานี พร้อมให้คำปรึกษาด้านอสังหาริมทรัพย์ทุกประเภท" />
+    <title><?= t('ติดต่อเรา','Contact Us') ?> | INVEZ <?= t('บริษัท โตโยซัพพลาย จำกัด','Toyo Supply Co., Ltd.') ?></title>
+    <meta name="description" content="<?= t('ติดต่อทีมงาน INVEZ บริษัท โตโยซัพพลาย จำกัด สำนักงานใหญ่จังหวัดอุดรธานี และสาขาปทุมธานี พร้อมให้คำปรึกษาด้านอสังหาริมทรัพย์ทุกประเภท','Contact INVEZ — Toyo Supply Co., Ltd. Head office in Udon Thani and Pathum Thani branch. Ready to advise on all property types.') ?>" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://www.invez.biz/contact" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="ติดต่อเรา | INVEZ บริษัท โตโยซัพพลาย จำกัด" />
-    <meta property="og:description" content="พร้อมให้คำปรึกษาด้านอสังหาริมทรัพย์ทุกประเภท ติดต่อทีมงาน INVEZ ได้เลย" />
+    <meta property="og:title" content="<?= t('ติดต่อเรา','Contact Us') ?> | INVEZ" />
+    <meta property="og:description" content="<?= t('พร้อมให้คำปรึกษาด้านอสังหาริมทรัพย์ทุกประเภท ติดต่อทีมงาน INVEZ ได้เลย','Ready to advise on all property types. Contact INVEZ now.') ?>" />
     <meta property="og:url" content="https://www.invez.biz/contact" />
     <meta property="og:site_name" content="INVEZ" />
     <meta name="theme-color" content="#ffffff" />
@@ -40,10 +43,10 @@
         <div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
             <div class="fade-up max-w-xl">
                 <h1 class="text-2xl md:text-3xl font-semibold text-[#1a1714] leading-snug mb-3">
-                    ติดต่อเรา
+                    <?= t('ติดต่อเรา','Contact Us') ?>
                 </h1>
                 <p class="text-[#6b5f52] text-sm leading-6">
-                    พร้อมให้คำปรึกษาทุกประเภทอสังหาริมทรัพย์ ไม่ว่าจะซื้อ ขาย หรือลงทุน
+                    <?= t('พร้อมให้คำปรึกษาทุกประเภทอสังหาริมทรัพย์ ไม่ว่าจะซื้อ ขาย หรือลงทุน','Ready to advise on all real estate matters — buy, sell, or invest.') ?>
                 </p>
             </div>
         </div>
@@ -56,15 +59,15 @@
             <!-- Key contact -->
             <div class="fade-up mb-14">
                 <div class="max-w-lg border border-[#e8e4df] rounded-lg p-7">
-                    <p class="text-xs text-[#c9a96e] font-medium mb-5">ผู้ติดต่อหลัก</p>
+                    <p class="text-xs text-[#c9a96e] font-medium mb-5"><?= t('ผู้ติดต่อหลัก','Primary Contact') ?></p>
 
                     <div class="flex items-start gap-4">
                         <div class="w-10 h-10 rounded-full bg-[#f5f3f0] border border-[#e8e4df] flex items-center justify-center flex-shrink-0">
                             <i data-feather="user" style="width:16px;height:16px;color:#9d8f82;"></i>
                         </div>
                         <div class="flex-1">
-                            <h2 class="text-base font-semibold text-[#1a1714] mb-0.5">คุณเอ็ดเวิร์ด</h2>
-                            <p class="text-[#9d8f82] text-xs mb-5">Mr. Edward · ที่ปรึกษาอสังหาริมทรัพย์</p>
+                            <h2 class="text-base font-semibold text-[#1a1714] mb-0.5"><?= t('คุณเอ็ดเวิร์ด','Mr. Edward') ?></h2>
+                            <p class="text-[#9d8f82] text-xs mb-5">Mr. Edward · <?= t('ที่ปรึกษาอสังหาริมทรัพย์','Real Estate Consultant') ?></p>
 
                             <div class="flex flex-col gap-2.5">
                                 <a href="tel:0816611286"
@@ -95,7 +98,7 @@
 
             <!-- Office Locations -->
             <div class="mb-3">
-                <h2 class="text-base font-semibold text-[#1a1714]">ที่ตั้งสำนักงาน</h2>
+                <h2 class="text-base font-semibold text-[#1a1714]"><?= t('ที่ตั้งสำนักงาน','Office Locations') ?></h2>
             </div>
 
             <div class="grid md:grid-cols-2 gap-3">
@@ -104,16 +107,16 @@
                     <div class="flex items-center gap-2.5 mb-5">
                         <i data-feather="map-pin" style="width:14px;height:14px;color:#c9a96e;"></i>
                         <div>
-                            <p class="text-[10px] text-[#c9a96e] font-medium uppercase">สำนักงานใหญ่</p>
-                            <p class="font-medium text-[#1a1714] text-sm">จังหวัดอุดรธานี</p>
+                            <p class="text-[10px] text-[#c9a96e] font-medium uppercase"><?= t('สำนักงานใหญ่','Head Office') ?></p>
+                            <p class="font-medium text-[#1a1714] text-sm"><?= t('จังหวัดอุดรธานี','Udon Thani') ?></p>
                         </div>
                     </div>
 
                     <address class="not-italic text-[#6b5f52] text-sm leading-7 mb-4">
-                        บริษัท โตโยซัพพลาย จำกัด<br>
-                        369/1 ถ.รอบเมือง (เก่าน้อย)<br>
-                        ต.หมากแข้ง อ.เมือง<br>
-                        จ.อุดรธานี 41000
+                        <?= t('บริษัท โตโยซัพพลาย จำกัด','Toyo Supply Co., Ltd.') ?><br>
+                        369/1 <?= t('ถ.รอบเมือง (เก่าน้อย)','Robmueang Rd. (Kao Noi)') ?><br>
+                        <?= t('ต.หมากแข้ง อ.เมือง','Mak Khaeng, Mueang') ?><br>
+                        <?= t('จ.อุดรธานี 41000','Udon Thani 41000') ?>
                     </address>
 
                     <a href="tel:042326647"
@@ -127,16 +130,16 @@
                     <div class="flex items-center gap-2.5 mb-5">
                         <i data-feather="map-pin" style="width:14px;height:14px;color:#c9a96e;"></i>
                         <div>
-                            <p class="text-[10px] text-[#c9a96e] font-medium uppercase">สาขา</p>
-                            <p class="font-medium text-[#1a1714] text-sm">จังหวัดปทุมธานี</p>
+                            <p class="text-[10px] text-[#c9a96e] font-medium uppercase"><?= t('สาขา','Branch') ?></p>
+                            <p class="font-medium text-[#1a1714] text-sm"><?= t('จังหวัดปทุมธานี','Pathum Thani') ?></p>
                         </div>
                     </div>
 
                     <address class="not-italic text-[#6b5f52] text-sm leading-7 mb-4">
-                        บริษัท โตโยซัพพลาย จำกัด<br>
-                        12/229 ม.7 ต.ลาดสวาย<br>
-                        อ.ลำลูกกา<br>
-                        จ.ปทุมธานี 12150
+                        <?= t('บริษัท โตโยซัพพลาย จำกัด','Toyo Supply Co., Ltd.') ?><br>
+                        12/229 <?= t('ม.7 ต.ลาดสวาย','Moo 7, Lad Sawai') ?><br>
+                        <?= t('อ.ลำลูกกา','Lam Luk Ka') ?><br>
+                        <?= t('จ.ปทุมธานี 12150','Pathum Thani 12150') ?>
                     </address>
 
                     <div class="flex flex-col gap-1.5 pt-3 border-t border-[#f0ebe3]">
@@ -161,7 +164,7 @@
     <section class="py-14 md:py-20 px-6 bg-[#fafaf8] border-t border-[#e8e4df]">
         <div class="max-w-6xl mx-auto">
             <div class="mb-8">
-                <h2 class="text-base font-semibold text-[#1a1714]">ช่องทางการติดต่อ</h2>
+                <h2 class="text-base font-semibold text-[#1a1714]"><?= t('ช่องทางการติดต่อ','Contact Channels') ?></h2>
             </div>
 
             <div class="grid sm:grid-cols-3 gap-3 max-w-2xl">
@@ -169,21 +172,21 @@
                 <a href="tel:0816611286"
                     class="bg-white border border-[#e8e4df] rounded-lg p-5 hover:border-[#c9a96e] transition-colors duration-150 group">
                     <i data-feather="phone" style="width:16px;height:16px;color:#c9a96e;" class="mb-3"></i>
-                    <p class="font-medium text-[#1a1714] text-sm mb-1">โทรศัพท์</p>
+                    <p class="font-medium text-[#1a1714] text-sm mb-1"><?= t('โทรศัพท์','Phone') ?></p>
                     <p class="text-[#9d8f82] text-xs leading-5">081-6611286<br>081-8716303</p>
                 </a>
 
                 <a href="mailto:toyoelectric@gmail.com"
                     class="bg-white border border-[#e8e4df] rounded-lg p-5 hover:border-[#c9a96e] transition-colors duration-150 group">
                     <i data-feather="mail" style="width:16px;height:16px;color:#c9a96e;" class="mb-3"></i>
-                    <p class="font-medium text-[#1a1714] text-sm mb-1">อีเมล</p>
+                    <p class="font-medium text-[#1a1714] text-sm mb-1"><?= t('อีเมล','Email') ?></p>
                     <p class="text-[#9d8f82] text-xs leading-5 break-all">toyoelectric<br>@gmail.com</p>
                 </a>
 
                 <a href="https://www.invez.biz" target="_blank" rel="noopener"
                     class="bg-white border border-[#e8e4df] rounded-lg p-5 hover:border-[#c9a96e] transition-colors duration-150 group">
                     <i data-feather="monitor" style="width:16px;height:16px;color:#c9a96e;" class="mb-3"></i>
-                    <p class="font-medium text-[#1a1714] text-sm mb-1">เว็บไซต์ & แอป</p>
+                    <p class="font-medium text-[#1a1714] text-sm mb-1"><?= t('เว็บไซต์ & แอป','Website & App') ?></p>
                     <p class="text-[#9d8f82] text-xs leading-5">www.invez.biz<br>App: Invez</p>
                 </a>
 
@@ -194,8 +197,8 @@
     <!-- CTA -->
     <section class="py-14 px-6 bg-[#1a1714]">
         <div class="max-w-2xl mx-auto text-center">
-            <h2 class="text-xl font-semibold text-white mb-3">มีทรัพย์อยากขาย หรืออยากซื้อ?</h2>
-            <p class="text-[#9d8f82] text-sm leading-6">เราพร้อมเป็นสะพานเชื่อมให้ทุกดีลจบลงด้วยความพึงพอใจของทุกฝ่าย</p>
+            <h2 class="text-xl font-semibold text-white mb-3"><?= t('มีทรัพย์อยากขาย หรืออยากซื้อ?','Looking to Buy or Sell?') ?></h2>
+            <p class="text-[#9d8f82] text-sm leading-6"><?= t('เราพร้อมเป็นสะพานเชื่อมให้ทุกดีลจบลงด้วยความพึงพอใจของทุกฝ่าย','We\'re here to bridge every deal to a satisfying outcome for all parties.') ?></p>
         </div>
     </section>
 

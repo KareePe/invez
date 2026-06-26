@@ -36,6 +36,7 @@ if ($count <= 1) {
 
 db()->prepare('DELETE FROM admins WHERE id = ?')->execute([$id]);
 
+log_admin_activity('delete', 'admin', $id, $target ?: '');
 flash('success', 'ลบแอดมินสำเร็จ');
 header('Location: admins');
 exit;

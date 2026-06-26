@@ -8,6 +8,18 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Tables
 -- -------------------------------------------------------
 
+CREATE TABLE IF NOT EXISTS `members` (
+  `id`            INT AUTO_INCREMENT PRIMARY KEY,
+  `first_name`    VARCHAR(100) NOT NULL,
+  `last_name`     VARCHAR(100) NOT NULL,
+  `phone`         VARCHAR(20)  DEFAULT NULL,
+  `email`         VARCHAR(255) UNIQUE NOT NULL,
+  `username`      VARCHAR(50)  UNIQUE NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `status`        VARCHAR(20)  NOT NULL DEFAULT 'pending',
+  `created_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `admins` (
   `id`         INT AUTO_INCREMENT PRIMARY KEY,
   `username`   VARCHAR(50)  UNIQUE NOT NULL,
@@ -36,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `properties` (
   `description`    TEXT         DEFAULT NULL,
   `sort_order`     INT          DEFAULT 0,
   `is_active`      TINYINT(1)   DEFAULT 1,
+  `token`          VARCHAR(32)  UNIQUE DEFAULT NULL,
   `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -54,6 +67,19 @@ CREATE TABLE IF NOT EXISTS `property_images` (
   `filename`    VARCHAR(255) NOT NULL,
   `sort_order`  INT          DEFAULT 0,
   FOREIGN KEY (`property_id`) REFERENCES `properties`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `property_interests` (
+  `id`             INT AUTO_INCREMENT PRIMARY KEY,
+  `transaction_id` CHAR(36)         UNIQUE DEFAULT NULL,
+  `member_id`      INT              NOT NULL,
+  `property_id`    INT              NOT NULL,
+  `amount_percent` TINYINT UNSIGNED NOT NULL,
+  `amount_value`   BIGINT           NOT NULL,
+  `bank`           VARCHAR(10)      NOT NULL,
+  `status`         VARCHAR(20)      NOT NULL DEFAULT 'pending',
+  `slip_filename`  VARCHAR(255)     DEFAULT NULL,
+  `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `articles` (
@@ -181,6 +207,23 @@ INSERT INTO `articles` (`id`,`icon`,`category`,`title`,`excerpt`,`intro`,`points
 (27,'edit-3','ออกแบบตกแต่งภายใน','เพราะบ้านที่ดี... ต้องเริ่มต้นจาก "ข้างใน"','การซื้ออสังหาฯ มาแล้ว สิ่งที่จะเปลี่ยนตึกเปล่าให้กลายเป็นบ้านหรือร้านค้าที่น่านั่งก็คือการออกแบบตกแต่งภายใน ต้องคำนึงถึงฟังก์ชัน วัสดุ และการสะท้อนตัวตน','การซื้ออสังหาฯ มาแล้ว สิ่งที่จะเปลี่ยนตึกเปล่าให้กลายเป็น "บ้าน" หรือ "ร้านค้าที่น่านั่ง" ก็คือการออกแบบตกแต่งภายใน','[{"label":"ฟังก์ชันต้องตอบโจทย์การใช้งานจริง","detail":"ไม่ใช่แค่สวยอย่างเดียว แต่ต้องเดินเหินสะดวก ปลั๊กไฟเพียงพอ และมีตู้เก็บของที่มิดชิด"},{"label":"การเลือกใช้วัสดุ","detail":"สวยและต้องทนทาน เหมาะกับไลฟ์สไตล์ (เช่น ถ้ามีสัตว์เลี้ยงก็ควรใช้วัสดุที่ทนรอยขีดข่วนได้ดี)"},{"label":"สะท้อนตัวตนของเจ้าของ","detail":"นักออกแบบที่ดีจะช่วยดึงสไตล์ที่คุณชอบ ออกมาเป็นผลงานที่มองแล้วไม่เบื่อ"}]');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- -------------------------------------------------------
+-- Admin Activity Log
+-- -------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `admin_activity_log` (
+  `id`         INT AUTO_INCREMENT PRIMARY KEY,
+  `admin_id`   INT NOT NULL,
+  `admin_name` VARCHAR(100) NOT NULL,
+  `action`     ENUM('create','update','delete') NOT NULL,
+  `entity`     VARCHAR(50) NOT NULL,
+  `entity_id`  INT DEFAULT NULL,
+  `label`      VARCHAR(255) DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_created_at` (`created_at`),
+  INDEX `idx_admin_id`   (`admin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- -------------------------------------------------------
 -- Next step: run admin/setup.php to create the first admin user

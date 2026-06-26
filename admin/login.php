@@ -1,5 +1,13 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('display_errors', 0);
+    session_set_cookie_params([
+        'httponly' => true,
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'samesite' => 'Lax',
+    ]);
+    session_start();
+}
 
 require_once('../config/db.php');
 
@@ -8,9 +16,18 @@ if (!empty($_SESSION['admin_id'])) {
     exit;
 }
 
+if (empty($_SESSION['_login_csrf'])) {
+    $_SESSION['_login_csrf'] = bin2hex(random_bytes(32));
+}
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['_login_csrf']) || !hash_equals($_SESSION['_login_csrf'], $_POST['_login_csrf'])) {
+        http_response_code(403);
+        die('Invalid request');
+    }
+
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
@@ -57,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form method="POST">
+                <input type="hidden" name="_login_csrf" value="<?= htmlspecialchars($_SESSION['_login_csrf']) ?>">
                 <div class="mb-5">
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
                     <input type="text" name="username"

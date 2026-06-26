@@ -15,6 +15,10 @@ if ($id < 1) {
     exit;
 }
 
+$prop_label = db()->prepare('SELECT title FROM properties WHERE id = ?');
+$prop_label->execute([$id]);
+$prop_label = (string)($prop_label->fetchColumn() ?: '');
+
 // Delete image files
 $imgs = db()->prepare('SELECT filename FROM property_images WHERE property_id = ?');
 $imgs->execute([$id]);
@@ -26,6 +30,7 @@ foreach ($imgs->fetchAll() as $img) {
 // DB cascade deletes highlights and images
 db()->prepare('DELETE FROM properties WHERE id = ?')->execute([$id]);
 
+log_admin_activity('delete', 'property', $id, $prop_label);
 flash('success', 'ลบทรัพย์สินสำเร็จ');
 header('Location: properties');
 exit;

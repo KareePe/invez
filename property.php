@@ -1,4 +1,5 @@
 <?php
+require_once('config/lang.php');
 require_once('config/db.php');
 require_once('properties_data.php');
 
@@ -13,24 +14,34 @@ if (!$p) {
     exit;
 }
 
-$h_stmt = db()->prepare('SELECT content FROM property_highlights WHERE property_id = ? ORDER BY sort_order ASC');
+// Lazy-generate checkout token for properties that don't have one yet
+if (empty($p['token'])) {
+    $tok = bin2hex(random_bytes(16));
+    try {
+        $u = db()->prepare("UPDATE properties SET token = ? WHERE id = ? AND token IS NULL");
+        $u->execute([$tok, $id]);
+        $p['token'] = $tok;
+    } catch (\PDOException $e) {}
+}
+
+$h_stmt = db()->prepare('SELECT content, content_en FROM property_highlights WHERE property_id = ? ORDER BY sort_order ASC');
 $h_stmt->execute([$id]);
-$p['highlights'] = $h_stmt->fetchAll(PDO::FETCH_COLUMN);
+$p['highlights'] = $h_stmt->fetchAll();
 
 $i_stmt = db()->prepare('SELECT filename FROM property_images WHERE property_id = ? ORDER BY sort_order ASC');
 $i_stmt->execute([$id]);
 $p['images'] = $i_stmt->fetchAll(PDO::FETCH_COLUMN);
 
 $current_page = 'properties';
-$cat_label = get_category_label($property_categories, $p['category']);
+$cat_label = get_category_label($property_categories, $p['category'], lang());
 $cat_icon  = get_category_icon($property_categories, $p['category']);
-$cover     = !empty($p['images']) ? 'assets/images/properties/'.$id.'/'.$p['images'][0] : null;
+$cover     = !empty($p['images']) ? 'assets/images/properties/'.$id.'/'.$p['images'][0] : 'assets/images/S__24510480.jpg';
 
 $meta_title = htmlspecialchars($p['title']) . ' | INVEZ';
 $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
 ?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= lang() ?>">
 
 <head>
     <meta charset="UTF-8" />
@@ -44,9 +55,7 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <meta property="og:title" content="<?= $meta_title ?>" />
     <meta property="og:description" content="<?= mb_substr($meta_desc, 0, 160) ?>" />
     <meta property="og:url" content="https://www.invez.biz/property/<?= $id ?>" />
-    <?php if ($cover): ?>
     <meta property="og:image" content="https://www.invez.biz/<?= htmlspecialchars($cover) ?>" />
-    <?php endif; ?>
     <meta property="og:site_name" content="INVEZ" />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
@@ -107,10 +116,10 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
                     <?= htmlspecialchars($cat_label) ?>
                 </span>
                 <h1 class="text-2xl md:text-3xl font-semibold text-[#1a1714] leading-snug mb-2">
-                    <?= htmlspecialchars($p['title']) ?>
+                    <?= htmlspecialchars(tf($p, 'title')) ?>
                 </h1>
                 <?php if (!empty($p['subtitle'])): ?>
-                <p class="text-[#6b5f52] text-sm"><?= htmlspecialchars($p['subtitle']) ?></p>
+                <p class="text-[#6b5f52] text-sm"><?= htmlspecialchars(tf($p, 'subtitle')) ?></p>
                 <?php endif; ?>
             </div>
 
@@ -126,10 +135,10 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             <div class="mb-8">
                 <div class="swiper rounded-lg border border-[#e8e4df] bg-[#f5f3f0] touch-manipulation" id="prop-slider">
                     <div class="swiper-wrapper">
-                        <?php foreach ($p['images'] as $img): ?>
+                        <?php foreach ($p['images'] as $_i => $img): ?>
                         <div class="swiper-slide">
                             <img src="assets/images/properties/<?= $id ?>/<?= htmlspecialchars($img) ?>"
-                                 alt="<?= htmlspecialchars($p['title']) ?>">
+                                 alt="<?= htmlspecialchars($p['title']) ?>"<?= $_i > 0 ? ' loading="lazy"' : '' ?>>
                         </div>
                         <?php endforeach; ?>
                     </div>
@@ -157,20 +166,31 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             <!-- Price + Status -->
             <div class="flex flex-wrap items-center justify-between gap-4 py-5 border-y border-[#e8e4df] mb-3">
                 <div>
-                    <p class="text-xs text-[#9d8f82] mb-0.5">ราคา</p>
+                    <p class="text-xs text-[#9d8f82] mb-0.5"><?= t('ราคา','Price') ?></p>
                     <p class="text-xl md:text-2xl font-semibold text-[#c9a96e]"><?= htmlspecialchars($p['price_display']) ?></p>
                 </div>
                 <?php if (!empty($p['status'])): ?>
                 <div class="text-right">
-                    <p class="text-xs text-[#9d8f82] mb-0.5">สถานะ</p>
-                    <p class="text-sm font-medium text-[#1a1714]"><?= htmlspecialchars($p['status']) ?></p>
+                    <p class="text-xs text-[#9d8f82] mb-0.5"><?= t('สถานะ','Status') ?></p>
+                    <p class="text-sm font-medium text-[#1a1714]"><?= htmlspecialchars(tf($p, 'status')) ?></p>
                 </div>
                 <?php endif; ?>
             </div>
 
+            <!-- Interest button -->
+            <?php if (!empty($p['price'])): ?>
+            <div class="mt-4 mb-6">
+                <a href="/checkout/<?= htmlspecialchars($p['token'] ?? '') ?>"
+                   class="inline-flex items-center gap-2 bg-[#c9a96e] hover:bg-[#b8965e] text-white px-6 py-2.5 rounded text-sm font-medium transition-colors duration-150">
+                    <?= t('สนใจทรัพย์สินนี้', 'Interested in This Property') ?>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+            <?php endif; ?>
+
             <!-- Share -->
             <div class="flex flex-wrap items-center gap-2 mb-8">
-                <span class="text-xs text-[#9d8f82]">แชร์:</span>
+                <span class="text-xs text-[#9d8f82]"><?= t('แชร์:','Share:') ?></span>
                 <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode('https://www.invez.biz/property/'.$id) ?>"
                    target="_blank" rel="noopener noreferrer"
                    class="text-xs text-white bg-[#1877F2] hover:bg-[#1464cc] px-3 py-1.5 rounded transition-colors">
@@ -187,22 +207,24 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
                     X
                 </a>
                 <button type="button" id="copy-btn"
+                        data-label="<?= t('คัดลอกลิงก์','Copy Link') ?>"
+                        data-copied="<?= t('คัดลอกแล้ว!','Copied!') ?>"
                         class="text-xs text-[#6b5f52] border border-[#e8e4df] hover:border-[#1a1714] hover:text-[#1a1714] px-3 py-1.5 rounded transition-colors">
-                    คัดลอกลิงก์
+                    <?= t('คัดลอกลิงก์','Copy Link') ?>
                 </button>
             </div>
 
             <!-- Key stats -->
             <?php
             $stats = [];
-            if (!empty($p['land_area']))   $stats[] = ['ที่ดิน', htmlspecialchars($p['land_area'])];
-            if (!empty($p['usable_area'])) $stats[] = ['พื้นที่ใช้สอย', htmlspecialchars($p['usable_area'])];
-            if (!empty($p['floors']))      $stats[] = ['จำนวนชั้น', htmlspecialchars($p['floors'])];
-            if (!empty($p['beds']))        $stats[] = [$p['category'] === 'hospital' ? 'เตียง' : 'ห้องนอน', $p['beds'].' '.($p['category'] === 'hospital' ? 'เตียง' : 'ห้อง')];
-            if (!empty($p['bathrooms']))   $stats[] = ['ห้องน้ำ', $p['bathrooms'].' ห้อง'];
-            if (!empty($p['parking']))     $stats[] = ['จอดรถ', htmlspecialchars($p['parking'])];
-            if (!empty($p['offices']))     $stats[] = ['ห้องสำนักงาน', $p['offices'].' ห้อง'];
-            if (!empty($p['location_short'])) $stats[] = ['ที่ตั้ง', htmlspecialchars($p['location_short'])];
+            if (!empty($p['land_area']))   $stats[] = [t('ที่ดิน','Land'), htmlspecialchars($p['land_area'])];
+            if (!empty($p['usable_area'])) $stats[] = [t('พื้นที่ใช้สอย','Usable Area'), htmlspecialchars($p['usable_area'])];
+            if (!empty($p['floors']))      $stats[] = [t('จำนวนชั้น','Floors'), htmlspecialchars($p['floors'])];
+            if (!empty($p['beds']))        $stats[] = [$p['category'] === 'hospital' ? t('เตียง','Beds') : t('ห้องนอน','Bedrooms'), $p['beds'].' '.($p['category'] === 'hospital' ? t('เตียง','beds') : t('ห้อง','rooms'))];
+            if (!empty($p['bathrooms']))   $stats[] = [t('ห้องน้ำ','Bathrooms'), $p['bathrooms'].' '.t('ห้อง','rooms')];
+            if (!empty($p['parking']))     $stats[] = [t('จอดรถ','Parking'), htmlspecialchars($p['parking'])];
+            if (!empty($p['offices']))     $stats[] = [t('ห้องสำนักงาน','Offices'), $p['offices'].' '.t('ห้อง','rooms')];
+            if (!empty($p['location_short'])) $stats[] = [t('ที่ตั้ง','Location'), htmlspecialchars(tf($p, 'location_short'))];
             ?>
             <?php if (!empty($stats)): ?>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[#e8e4df] border border-[#e8e4df] rounded-lg overflow-hidden mb-8">
@@ -218,12 +240,12 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             <!-- Description -->
             <?php if (!empty($p['description'])): ?>
             <div class="mb-8">
-                <h2 class="text-base font-semibold text-[#1a1714] mb-3">รายละเอียด</h2>
-                <p class="text-[#5a4e42] text-sm leading-7"><?= htmlspecialchars($p['description']) ?></p>
+                <h2 class="text-base font-semibold text-[#1a1714] mb-3"><?= t('รายละเอียด','Details') ?></h2>
+                <p class="text-[#5a4e42] text-sm leading-7"><?= htmlspecialchars(tf($p, 'description')) ?></p>
                 <?php if (!empty($p['location'])): ?>
                 <p class="text-xs text-[#9d8f82] mt-3 flex items-center gap-1">
                     <i data-feather="map-pin" style="width:11px;height:11px;"></i>
-                    <?= htmlspecialchars($p['location']) ?>
+                    <?= htmlspecialchars(tf($p, 'location')) ?>
                 </p>
                 <?php endif; ?>
             </div>
@@ -232,12 +254,12 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             <!-- Highlights -->
             <?php if (!empty($p['highlights'])): ?>
             <div class="mb-8">
-                <h2 class="text-base font-semibold text-[#1a1714] mb-4">จุดเด่น</h2>
+                <h2 class="text-base font-semibold text-[#1a1714] mb-4"><?= t('จุดเด่น','Highlights') ?></h2>
                 <div class="space-y-2">
                     <?php foreach ($p['highlights'] as $i => $h): ?>
                     <div class="flex gap-3 items-start py-3 border-b border-[#f0ebe3] last:border-0">
                         <span class="w-5 h-5 rounded-full bg-[#c9a96e] text-white flex items-center justify-center text-[10px] font-semibold flex-shrink-0 mt-0.5"><?= $i + 1 ?></span>
-                        <p class="text-[#5a4e42] text-sm leading-6"><?= htmlspecialchars($h) ?></p>
+                        <p class="text-[#5a4e42] text-sm leading-6"><?= htmlspecialchars(tf($h, 'content')) ?></p>
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -254,11 +276,11 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
             <a href="/properties?cat=<?= htmlspecialchars($p['category']) ?>"
                class="flex items-center gap-1.5 text-[#6b5f52] hover:text-[#1a1714] transition-colors text-sm">
                 <i data-feather="arrow-left" style="width:14px;height:14px;"></i>
-                <?= htmlspecialchars($cat_label) ?>ทั้งหมด
+                <?= htmlspecialchars($cat_label) ?> <?= t('ทั้งหมด','All') ?>
             </a>
             <a href="/properties"
                class="text-xs text-[#9d8f82] hover:text-[#1a1714] transition-colors">
-                ดูทั้งหมด
+                <?= t('ดูทั้งหมด','View All') ?>
             </a>
         </div>
     </section>
@@ -266,11 +288,11 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <!-- CTA -->
     <section class="py-14 px-6 bg-[#1a1714]">
         <div class="max-w-2xl mx-auto text-center">
-            <h2 class="text-lg font-semibold text-white mb-2">สนใจทรัพย์สินนี้?</h2>
-            <p class="text-[#9d8f82] text-sm leading-6 mb-6">ทีมงาน INVEZ พร้อมให้ข้อมูลและเจรจาดีลที่ตรงโจทย์ให้คุณ</p>
+            <h2 class="text-lg font-semibold text-white mb-2"><?= t('สนใจทรัพย์สินนี้?','Interested in This Property?') ?></h2>
+            <p class="text-[#9d8f82] text-sm leading-6 mb-6"><?= t('ทีมงาน INVEZ พร้อมให้ข้อมูลและเจรจาดีลที่ตรงโจทย์ให้คุณ','The INVEZ team is ready to provide information and negotiate the right deal for you.') ?></p>
             <a href="/contact"
                class="inline-flex items-center gap-2 bg-[#c9a96e] text-white px-6 py-2.5 rounded text-sm font-medium hover:bg-[#b8965e] transition-colors duration-150">
-                ติดต่อเรา
+                <?= t('ติดต่อเรา','Contact Us') ?>
             </a>
         </div>
     </section>
@@ -311,11 +333,10 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
         })();
         // Copy link
         document.getElementById('copy-btn')?.addEventListener('click', () => {
+            const btn = document.getElementById('copy-btn');
             navigator.clipboard.writeText(window.location.href).then(() => {
-                const btn = document.getElementById('copy-btn');
-                const orig = btn.textContent;
-                btn.textContent = 'คัดลอกแล้ว!';
-                setTimeout(() => { btn.textContent = orig; }, 2000);
+                btn.textContent = btn.dataset.copied;
+                setTimeout(() => { btn.textContent = btn.dataset.label; }, 2000);
             });
         });
     </script>

@@ -1,6 +1,9 @@
-<?php $current_page = 'home'; ?>
+<?php
+$current_page = 'home';
+require_once('config/lang.php');
+?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= lang() ?>">
 
 <head>
     <meta charset="UTF-8" />
@@ -40,12 +43,14 @@
                 <img src="assets/images/logo-w.png" class="w-[160px] mb-8 opacity-95" alt="INVEZ">
 
                 <p class="text-sm md:text-base text-white/70 mb-4 font-light tracking-wide">
-                    ศูนย์รวมอสังหาริมทรัพย์ ครบจบในที่เดียว
+                    <?= t('ศูนย์รวมอสังหาริมทรัพย์ ครบจบในที่เดียว','Real Estate Center — All in One Place') ?>
                 </p>
 
                 <h1 class="max-w-2xl text-base md:text-lg text-white/60 font-light leading-7 mb-10">
-                    แพลตฟอร์ม INVEZ เป็นศูนย์รวมอสังหาริมทรัพย์ทุกประเภท ครบจบในที่เดียว
-                    สำหรับการอยู่อาศัย ธุรกิจ และการลงทุน INVEZ เชื่อมต่อผู้ซื้อ ผู้ขาย และนักลงทุน เข้ากับโอกาสที่ดีที่สุดในทุกทำเล
+                    <?= t(
+                        'แพลตฟอร์ม INVEZ เป็นศูนย์รวมอสังหาริมทรัพย์ทุกประเภท ครบจบในที่เดียว สำหรับการอยู่อาศัย ธุรกิจ และการลงทุน INVEZ เชื่อมต่อผู้ซื้อ ผู้ขาย และนักลงทุน เข้ากับโอกาสที่ดีที่สุดในทุกทำเล',
+                        'INVEZ is a comprehensive real estate platform covering all property types — residential, commercial, and investment. We connect buyers, sellers, and investors with the best opportunities in every location.'
+                    ) ?>
                 </h1>
 
                 <div class="w-px h-10 bg-white/20 mb-8"></div>
@@ -54,7 +59,7 @@
 
                     <p class="flex items-center justify-center gap-2">
                         <i data-feather="user" style="width:13px;height:13px;opacity:0.5;"></i>
-                        คุณเอ็ดเวิร์ด "Mr.Edward"
+                        <?= t('คุณเอ็ดเวิร์ด','Mr. Edward') ?> "Mr.Edward"
                     </p>
 
                     <p class="flex items-center justify-center gap-2">

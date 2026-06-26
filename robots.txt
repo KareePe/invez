@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /member/
+Disallow: /config/
+Disallow: /database/
+Disallow: /assets/uploads/
+Allow: /
+
+Sitemap: https://www.invez.biz/sitemap.xml

@@ -33,65 +33,87 @@ if (!$is_new) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
 
-    $title          = trim($_POST['title'] ?? '');
-    $category       = trim($_POST['category'] ?? '');
-    $subtitle       = trim($_POST['subtitle'] ?? '');
-    $price          = $_POST['price'] !== '' ? (int)$_POST['price'] : null;
-    $price_display  = trim($_POST['price_display'] ?? '');
-    $location       = trim($_POST['location'] ?? '');
-    $location_short = trim($_POST['location_short'] ?? '');
-    $land_area      = trim($_POST['land_area'] ?? '');
-    $usable_area    = trim($_POST['usable_area'] ?? '');
-    $floors         = trim($_POST['floors'] ?? '');
-    $beds           = $_POST['beds'] !== '' ? (int)$_POST['beds'] : null;
-    $bathrooms      = $_POST['bathrooms'] !== '' ? (int)$_POST['bathrooms'] : null;
-    $parking        = trim($_POST['parking'] ?? '');
-    $offices        = $_POST['offices'] !== '' ? (int)$_POST['offices'] : null;
-    $status         = trim($_POST['status'] ?? '');
-    $description    = trim($_POST['description'] ?? '');
-    $sort_order     = (int)($_POST['sort_order'] ?? 0);
-    $is_active      = isset($_POST['is_active']) ? 1 : 0;
+    $title             = trim($_POST['title'] ?? '');
+    $title_en          = trim($_POST['title_en'] ?? '');
+    $category          = trim($_POST['category'] ?? '');
+    $subtitle          = trim($_POST['subtitle'] ?? '');
+    $subtitle_en       = trim($_POST['subtitle_en'] ?? '');
+    $price             = $_POST['price'] !== '' ? (int)$_POST['price'] : null;
+    $price_display     = trim($_POST['price_display'] ?? '');
+    $location          = trim($_POST['location'] ?? '');
+    $location_en       = trim($_POST['location_en'] ?? '');
+    $location_short    = trim($_POST['location_short'] ?? '');
+    $location_short_en = trim($_POST['location_short_en'] ?? '');
+    $land_area         = trim($_POST['land_area'] ?? '');
+    $usable_area       = trim($_POST['usable_area'] ?? '');
+    $floors            = trim($_POST['floors'] ?? '');
+    $beds              = $_POST['beds'] !== '' ? (int)$_POST['beds'] : null;
+    $bathrooms         = $_POST['bathrooms'] !== '' ? (int)$_POST['bathrooms'] : null;
+    $parking           = trim($_POST['parking'] ?? '');
+    $offices           = $_POST['offices'] !== '' ? (int)$_POST['offices'] : null;
+    $status            = trim($_POST['status'] ?? '');
+    $status_en         = trim($_POST['status_en'] ?? '');
+    $description       = trim($_POST['description'] ?? '');
+    $description_en    = trim($_POST['description_en'] ?? '');
+    $sort_order        = (int)($_POST['sort_order'] ?? 0);
+    $is_active         = isset($_POST['is_active']) ? 1 : 0;
 
     if ($title === '')    $errors[] = 'กรุณากรอกชื่อทรัพย์สิน';
     if ($category === '') $errors[] = 'กรุณาเลือกหมวดหมู่';
 
     if (empty($errors)) {
         $fields = [
-            $category, $title, $subtitle ?: null, $price, $price_display ?: null,
-            $location ?: null, $location_short ?: null,
+            $category,
+            $title, $title_en ?: null,
+            $subtitle ?: null, $subtitle_en ?: null,
+            $price, $price_display ?: null,
+            $location ?: null, $location_en ?: null,
+            $location_short ?: null, $location_short_en ?: null,
             $land_area ?: null, $usable_area ?: null, $floors ?: null,
             $beds, $bathrooms, $parking ?: null, $offices,
-            $status ?: null, $description ?: null,
+            $status ?: null, $status_en ?: null,
+            $description ?: null, $description_en ?: null,
             $sort_order, $is_active,
         ];
 
         if ($is_new) {
             $stmt = db()->prepare(
                 'INSERT INTO properties
-                 (category,title,subtitle,price,price_display,location,location_short,
+                 (category,title,title_en,subtitle,subtitle_en,price,price_display,
+                  location,location_en,location_short,location_short_en,
                   land_area,usable_area,floors,beds,bathrooms,parking,offices,
-                  status,description,sort_order,is_active)
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                  status,status_en,description,description_en,sort_order,is_active)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->execute($fields);
             $id = (int)db()->lastInsertId();
+            db()->prepare("UPDATE properties SET token = ? WHERE id = ? AND token IS NULL")
+                ->execute([bin2hex(random_bytes(16)), $id]);
         } else {
             $stmt = db()->prepare(
                 'UPDATE properties SET
-                 category=?,title=?,subtitle=?,price=?,price_display=?,location=?,location_short=?,
+                 category=?,title=?,title_en=?,subtitle=?,subtitle_en=?,price=?,price_display=?,
+                 location=?,location_en=?,location_short=?,location_short_en=?,
                  land_area=?,usable_area=?,floors=?,beds=?,bathrooms=?,parking=?,offices=?,
-                 status=?,description=?,sort_order=?,is_active=?
+                 status=?,status_en=?,description=?,description_en=?,sort_order=?,is_active=?
                  WHERE id=?'
             );
             $stmt->execute(array_merge($fields, [$id]));
         }
 
-        // Highlights: delete all and re-insert
+        // Highlights: delete all and re-insert with paired EN values
         db()->prepare('DELETE FROM property_highlights WHERE property_id = ?')->execute([$id]);
-        $raw_hl = array_filter(array_map('trim', $_POST['highlights'] ?? []), fn($v) => $v !== '');
-        $hl_stmt = db()->prepare('INSERT INTO property_highlights (property_id, content, sort_order) VALUES (?,?,?)');
-        foreach (array_values($raw_hl) as $i => $hl) {
-            $hl_stmt->execute([$id, $hl, $i + 1]);
+        $raw_hl    = array_map('trim', $_POST['highlights'] ?? []);
+        $raw_hl_en = array_map('trim', $_POST['highlights_en'] ?? []);
+        $hl_stmt   = db()->prepare('INSERT INTO property_highlights (property_id, content, content_en, sort_order) VALUES (?,?,?,?)');
+        $count = max(count($raw_hl), count($raw_hl_en));
+        $sort  = 1;
+        for ($i = 0; $i < $count; $i++) {
+            $th = $raw_hl[$i] ?? '';
+            $en = $raw_hl_en[$i] ?? '';
+            if ($th !== '' || $en !== '') {
+                $hl_stmt->execute([$id, $th ?: null, $en ?: null, $sort++]);
+            }
         }
 
         // Delete marked images
@@ -137,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        log_admin_activity($is_new ? 'create' : 'update', 'property', $id, $title);
         flash('success', $is_new ? 'เพิ่มทรัพย์สินสำเร็จ' : 'บันทึกทรัพย์สินสำเร็จ');
         header('Location: properties');
         exit;
@@ -144,7 +167,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Re-populate $prop from POST on error
     $prop = array_merge($_POST, ['id' => $id]);
-    $highlights = array_map(fn($v) => ['content' => $v], $_POST['highlights'] ?? []);
+    $raw_hl_err    = $_POST['highlights'] ?? [];
+    $raw_hl_en_err = $_POST['highlights_en'] ?? [];
+    $count_err = max(count($raw_hl_err), count($raw_hl_en_err));
+    $highlights = [];
+    for ($i = 0; $i < $count_err; $i++) {
+        $highlights[] = ['content' => $raw_hl_err[$i] ?? '', 'content_en' => $raw_hl_en_err[$i] ?? ''];
+    }
 }
 
 include('_header.php');
@@ -160,6 +189,15 @@ include('_header.php');
 
 <form method="POST" enctype="multipart/form-data" class="space-y-6">
     <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+
+    <!-- Language tab switcher -->
+    <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-500">ภาษา / Language:</span>
+        <div class="flex text-xs border border-gray-200 rounded-lg overflow-hidden">
+            <button type="button" class="lang-tab-btn px-4 py-1.5 font-medium bg-[#c9a96e] text-white" data-lang="th">TH</button>
+            <button type="button" class="lang-tab-btn px-4 py-1.5 font-medium text-gray-500 hover:bg-gray-50" data-lang="en">EN</button>
+        </div>
+    </div>
 
     <div class="grid grid-cols-2 gap-6">
 
@@ -179,21 +217,47 @@ include('_header.php');
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">ชื่อทรัพย์สิน *</label>
-                        <input type="text" name="title" value="<?= htmlspecialchars($prop['title'] ?? '') ?>"
-                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]" required>
+                    <!-- TH fields -->
+                    <div class="lang-panel" data-lang="th">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">ชื่อทรัพย์สิน *</label>
+                                <input type="text" name="title" value="<?= htmlspecialchars($prop['title'] ?? '') ?>"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Subtitle</label>
+                                <input type="text" name="subtitle" value="<?= htmlspecialchars($prop['subtitle'] ?? '') ?>"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">สถานะ</label>
+                                <input type="text" name="status" value="<?= htmlspecialchars($prop['status'] ?? '') ?>"
+                                       placeholder="เช่น พร้อมขาย, ดำเนินกิจการอยู่"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">Subtitle</label>
-                        <input type="text" name="subtitle" value="<?= htmlspecialchars($prop['subtitle'] ?? '') ?>"
-                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">สถานะ</label>
-                        <input type="text" name="status" value="<?= htmlspecialchars($prop['status'] ?? '') ?>"
-                               placeholder="เช่น พร้อมขาย, ดำเนินกิจการอยู่"
-                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                    <!-- EN fields -->
+                    <div class="lang-panel hidden" data-lang="en">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Property Name (EN)</label>
+                                <input type="text" name="title_en" value="<?= htmlspecialchars($prop['title_en'] ?? '') ?>"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Subtitle (EN)</label>
+                                <input type="text" name="subtitle_en" value="<?= htmlspecialchars($prop['subtitle_en'] ?? '') ?>"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Status (EN)</label>
+                                <input type="text" name="status_en" value="<?= htmlspecialchars($prop['status_en'] ?? '') ?>"
+                                       placeholder="e.g. For Sale, In Operation"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -217,7 +281,8 @@ include('_header.php');
 
             <div class="bg-white rounded-xl border border-gray-200 p-5">
                 <h3 class="font-semibold text-gray-700 text-sm mb-4">ที่ตั้ง</h3>
-                <div class="space-y-4">
+                <!-- TH location -->
+                <div class="lang-panel space-y-4" data-lang="th">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">ที่อยู่เต็ม</label>
                         <textarea name="location" rows="2"
@@ -227,6 +292,20 @@ include('_header.php');
                         <label class="block text-xs font-medium text-gray-600 mb-1">ที่ตั้งสั้น</label>
                         <input type="text" name="location_short" value="<?= htmlspecialchars($prop['location_short'] ?? '') ?>"
                                placeholder="เช่น ตลิ่งชัน, กรุงเทพฯ"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                    </div>
+                </div>
+                <!-- EN location -->
+                <div class="lang-panel hidden space-y-4" data-lang="en">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Full Address (EN)</label>
+                        <textarea name="location_en" rows="2"
+                                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e] resize-none"><?= htmlspecialchars($prop['location_en'] ?? '') ?></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Short Location (EN)</label>
+                        <input type="text" name="location_short_en" value="<?= htmlspecialchars($prop['location_short_en'] ?? '') ?>"
+                               placeholder="e.g. Bangkok, Thailand"
                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
                     </div>
                 </div>
@@ -263,8 +342,15 @@ include('_header.php');
 
             <div class="bg-white rounded-xl border border-gray-200 p-5">
                 <h3 class="font-semibold text-gray-700 text-sm mb-4">รายละเอียด</h3>
-                <textarea name="description" rows="5"
-                          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e] resize-none"><?= htmlspecialchars($prop['description'] ?? '') ?></textarea>
+                <div class="lang-panel" data-lang="th">
+                    <textarea name="description" rows="5"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e] resize-none"><?= htmlspecialchars($prop['description'] ?? '') ?></textarea>
+                </div>
+                <div class="lang-panel hidden" data-lang="en">
+                    <textarea name="description_en" rows="5"
+                              placeholder="Description in English"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e] resize-none"><?= htmlspecialchars($prop['description_en'] ?? '') ?></textarea>
+                </div>
             </div>
 
             <div class="bg-white rounded-xl border border-gray-200 p-5">
@@ -287,20 +373,30 @@ include('_header.php');
 
     <!-- Highlights -->
     <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-1">
             <h3 class="font-semibold text-gray-700 text-sm">จุดเด่น</h3>
             <button type="button" onclick="addHighlight()"
                     class="text-xs text-[#c9a96e] border border-[#c9a96e] px-3 py-1.5 rounded-lg hover:bg-[#c9a96e]/10 transition-colors">
                 + เพิ่มจุดเด่น
             </button>
         </div>
+        <p class="text-[10px] text-gray-400 mb-3">กรอกทั้ง TH และ EN ในแต่ละแถว (EN ไม่บังคับ)</p>
+        <div class="grid grid-cols-2 gap-2 text-[10px] font-medium text-gray-400 mb-1 px-1">
+            <span>ภาษาไทย</span><span>English</span>
+        </div>
         <div id="highlights-list" class="space-y-2">
             <?php foreach ($highlights as $hl): ?>
-            <div class="flex gap-2 items-center">
-                <input type="text" name="highlights[]" value="<?= htmlspecialchars($hl['content']) ?>"
-                       class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
-                <button type="button" onclick="this.parentElement.remove()"
-                        class="text-gray-400 hover:text-red-500 flex-shrink-0 text-lg leading-none">&times;</button>
+            <div class="grid grid-cols-2 gap-2 items-center highlight-row">
+                <input type="text" name="highlights[]" value="<?= htmlspecialchars($hl['content'] ?? '') ?>"
+                       placeholder="ภาษาไทย"
+                       class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                <div class="flex gap-1">
+                    <input type="text" name="highlights_en[]" value="<?= htmlspecialchars($hl['content_en'] ?? '') ?>"
+                           placeholder="English"
+                           class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                    <button type="button" onclick="this.closest('.highlight-row').remove()"
+                            class="text-gray-400 hover:text-red-500 flex-shrink-0 text-lg leading-none px-1">&times;</button>
+                </div>
             </div>
             <?php endforeach; ?>
         </div>
@@ -348,14 +444,34 @@ include('_header.php');
 <script>
 function addHighlight() {
     const row = document.createElement('div');
-    row.className = 'flex gap-2 items-center';
-    row.innerHTML = `<input type="text" name="highlights[]"
-        class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
-        <button type="button" onclick="this.parentElement.remove()"
-            class="text-gray-400 hover:text-red-500 flex-shrink-0 text-lg leading-none">&times;</button>`;
+    row.className = 'grid grid-cols-2 gap-2 items-center highlight-row';
+    row.innerHTML = `
+        <input type="text" name="highlights[]" placeholder="ภาษาไทย"
+            class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+        <div class="flex gap-1">
+            <input type="text" name="highlights_en[]" placeholder="English"
+                class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+            <button type="button" onclick="this.closest('.highlight-row').remove()"
+                class="text-gray-400 hover:text-red-500 flex-shrink-0 text-lg leading-none px-1">&times;</button>
+        </div>`;
     document.getElementById('highlights-list').appendChild(row);
     row.querySelector('input').focus();
 }
+
+// Global language tab switcher
+document.querySelectorAll('.lang-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const lang = btn.dataset.lang;
+        document.querySelectorAll('.lang-tab-btn').forEach(b => {
+            b.classList.toggle('bg-[#c9a96e]', b.dataset.lang === lang);
+            b.classList.toggle('text-white',   b.dataset.lang === lang);
+            b.classList.toggle('text-gray-500', b.dataset.lang !== lang);
+        });
+        document.querySelectorAll('.lang-panel').forEach(p => {
+            p.classList.toggle('hidden', p.dataset.lang !== lang);
+        });
+    });
+});
 </script>
 
 <?php include('_footer.php'); ?>

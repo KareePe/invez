@@ -63,11 +63,12 @@ jobs:
       - name: Deploy UAT via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_UAT_SERVER }}
-          username: ${{ secrets.FTP_UAT_USERNAME }}
-          password: ${{ secrets.FTP_UAT_PASSWORD }}
-          protocol: ftps
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
           server-dir: /uat.invez.biz/
+          log-level: verbose
           exclude: |
             **/.git*
             **/.git*/**
