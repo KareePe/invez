@@ -113,13 +113,13 @@ include('_header.php');
             <label class="block text-xs font-medium text-gray-600 mb-1">
                 Password <?= $is_new ? '*' : '(เว้นว่างถ้าไม่เปลี่ยน)' ?>
             </label>
-            <input type="password" name="password" autocomplete="new-password"
+            <input type="password" name="password" id="password" autocomplete="new-password"
                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]"
                    <?= $is_new ? 'required' : '' ?>>
         </div>
         <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">ยืนยัน Password</label>
-            <input type="password" name="confirm" autocomplete="new-password"
+            <input type="password" name="confirm" data-pw-match="password" autocomplete="new-password"
                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
         </div>
     </div>

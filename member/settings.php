@@ -18,8 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $last_name  = trim($_POST['last_name']  ?? '');
     $phone      = trim($_POST['phone']      ?? '');
     $email      = trim($_POST['email']      ?? '');
-    $pw         = $_POST['new_password']     ?? '';
-    $pw_confirm = $_POST['confirm_password'] ?? '';
 
     if ($first_name === '') $errors[] = t('กรุณากรอกชื่อ','Please enter first name');
     if ($last_name === '')  $errors[] = t('กรุณากรอกนามสกุล','Please enter last name');
@@ -33,23 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($chk->fetch()) $errors[] = t('อีเมลนี้ถูกใช้งานแล้ว','Email already in use');
     }
 
-    if ($pw !== '') {
-        if (strlen($pw) < 8)
-            $errors[] = t('รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร','Password must be at least 8 characters');
-        elseif (!preg_match('/[a-zA-Z]/', $pw) || !preg_match('/[0-9]/', $pw))
-            $errors[] = t('รหัสผ่านต้องมีทั้งตัวอักษรและตัวเลข','Password must contain letters and numbers');
-        elseif ($pw !== $pw_confirm)
-            $errors[] = t('รหัสผ่านไม่ตรงกัน','Passwords do not match');
-    }
+    // Passwords are not changed here — that goes through the emailed reset link
+    // instead, so a hijacked session cannot silently take over the account.
 
     if (empty($errors)) {
-        if ($pw !== '') {
-            db()->prepare('UPDATE members SET first_name=?,last_name=?,phone=?,email=?,password_hash=? WHERE id=?')
-               ->execute([$first_name, $last_name, $phone ?: null, $email, password_hash($pw, PASSWORD_DEFAULT), $_SESSION['member_id']]);
-        } else {
-            db()->prepare('UPDATE members SET first_name=?,last_name=?,phone=?,email=? WHERE id=?')
-               ->execute([$first_name, $last_name, $phone ?: null, $email, $_SESSION['member_id']]);
-        }
+        db()->prepare('UPDATE members SET first_name=?,last_name=?,phone=?,email=? WHERE id=?')
+           ->execute([$first_name, $last_name, $phone ?: null, $email, $_SESSION['member_id']]);
+
         $_SESSION['member_name'] = $first_name . ' ' . $last_name;
         $member = array_merge($member, ['first_name'=>$first_name,'last_name'=>$last_name,'phone'=>$phone,'email'=>$email]);
         $success = true;
@@ -99,18 +87,6 @@ include('_header.php');
                    class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]" required>
         </div>
 
-        <div class="pt-2 border-t border-[#f0ebe3]">
-            <p class="text-xs text-[#9d8f82] mb-3"><?= t('เปลี่ยนรหัสผ่าน (เว้นว่างไว้หากไม่ต้องการเปลี่ยน)','Change Password (leave blank to keep current)') ?></p>
-            <div class="space-y-3">
-                <input type="password" name="new_password"
-                       placeholder="<?= t('รหัสผ่านใหม่ (อย่างน้อย 8 ตัว ต้องมีตัวอักษรและตัวเลข)','New password (min 8 chars, letters + numbers)') ?>"
-                       class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
-                <input type="password" name="confirm_password"
-                       placeholder="<?= t('ยืนยันรหัสผ่านใหม่','Confirm new password') ?>"
-                       class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
-            </div>
-        </div>
-
         <div class="pt-1">
             <p class="text-xs text-[#9d8f82] mb-1"><?= t('ชื่อผู้ใช้งาน','Username') ?></p>
             <p class="text-sm text-[#1a1714] font-mono"><?= htmlspecialchars($member['username']) ?></p>
@@ -120,6 +96,17 @@ include('_header.php');
             <?= t('บันทึก','Save') ?>
         </button>
     </form>
+
+    <div class="bg-white rounded-xl border border-[#e8e4df] p-6">
+        <h3 class="font-semibold text-[#1a1714] text-sm mb-1.5"><?= t('รหัสผ่าน','Password') ?></h3>
+        <p class="text-xs text-[#9d8f82] mb-4 leading-5">
+            <?= t('เพื่อความปลอดภัย การเปลี่ยนรหัสผ่านจะทำผ่านลิงก์ที่ส่งไปยังอีเมลของคุณ','For your security, changing your password is done through a link sent to your email') ?>
+        </p>
+        <a href="/forgot-password"
+           class="inline-block border border-[#c9a96e] text-[#c9a96e] hover:bg-[#c9a96e] hover:text-white font-medium px-5 py-2.5 rounded-lg text-sm transition-colors">
+            <?= t('เปลี่ยนรหัสผ่าน','Change Password') ?>
+        </a>
+    </div>
 
 </div>
 

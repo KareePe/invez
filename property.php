@@ -38,7 +38,9 @@ $cat_icon  = get_category_icon($property_categories, $p['category']);
 $cover     = !empty($p['images']) ? 'assets/images/properties/'.$id.'/'.$p['images'][0] : 'assets/images/S__24510480.jpg';
 
 $meta_title = htmlspecialchars($p['title']) . ' | INVEZ';
-$meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
+// Trim first, escape second — cutting an already-escaped string can slice an
+// HTML entity in half (&quot; -> &qu) and garble the description.
+$meta_desc  = htmlspecialchars(mb_substr($p['description'] ?? $p['title'], 0, 160));
 ?>
 <!DOCTYPE html>
 <html lang="<?= lang() ?>">
@@ -48,12 +50,12 @@ $meta_desc  = htmlspecialchars($p['description'] ?? $p['title']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title><?= $meta_title ?></title>
-    <meta name="description" content="<?= mb_substr($meta_desc, 0, 160) ?>" />
+    <meta name="description" content="<?= $meta_desc ?>" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://www.invez.biz/property/<?= $id ?>" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="<?= $meta_title ?>" />
-    <meta property="og:description" content="<?= mb_substr($meta_desc, 0, 160) ?>" />
+    <meta property="og:description" content="<?= $meta_desc ?>" />
     <meta property="og:url" content="https://www.invez.biz/property/<?= $id ?>" />
     <meta property="og:image" content="https://www.invez.biz/<?= htmlspecialchars($cover) ?>" />
     <meta property="og:site_name" content="INVEZ" />

@@ -1,5 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once(__DIR__ . '/../config/session.php');
 
 // Compute base path before any redirect
 $_member_base = rtrim(str_replace('\\', '/', str_replace(

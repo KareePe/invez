@@ -226,5 +226,54 @@ CREATE TABLE IF NOT EXISTS `admin_activity_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- -------------------------------------------------------
+-- Password Reset Tokens
+-- Only the SHA-256 hash of the token is stored, so a leaked database
+-- does not hand out working reset links.
+-- -------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `password_resets` (
+  `id`         INT AUTO_INCREMENT PRIMARY KEY,
+  `member_id`  INT NOT NULL,
+  `token_hash` CHAR(64) NOT NULL,
+  `expires_at` DATETIME NOT NULL,
+  `used_at`    DATETIME DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `uniq_token_hash` (`token_hash`),
+  INDEX `idx_member_id` (`member_id`),
+  FOREIGN KEY (`member_id`) REFERENCES `members`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -------------------------------------------------------
+-- Password Reset Rate Limiting
+-- One row per accepted request on forgot-password.php. The email is stored
+-- hashed so the table cannot be mined for addresses. Rows older than a day
+-- are pruned automatically on each request.
+-- -------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `password_reset_attempts` (
+  `id`         INT AUTO_INCREMENT PRIMARY KEY,
+  `ip`         VARCHAR(45) NOT NULL,
+  `email_hash` CHAR(64) NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_ip_created`    (`ip`, `created_at`),
+  INDEX `idx_email_created` (`email_hash`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -------------------------------------------------------
+-- Login Throttling
+-- One row per failed login. Rows are deleted when that IP logs in
+-- successfully, and expire on their own once older than the block window.
+-- `scope` keeps the member and admin logins on separate counters.
+-- -------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `login_attempts` (
+  `id`         INT AUTO_INCREMENT PRIMARY KEY,
+  `ip`         VARCHAR(45) NOT NULL,
+  `scope`      VARCHAR(10) NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_ip_scope_created` (`ip`, `scope`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -------------------------------------------------------
 -- Next step: run admin/setup.php to create the first admin user
 -- -------------------------------------------------------

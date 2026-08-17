@@ -8,11 +8,20 @@ if (!empty($_SESSION['member_id'])) {
     exit;
 }
 
+if (empty($_SESSION['_register_csrf'])) {
+    $_SESSION['_register_csrf'] = bin2hex(random_bytes(32));
+}
+
 $errors  = [];
 $success = false;
 $old     = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['_register_csrf']) || !hash_equals($_SESSION['_register_csrf'], $_POST['_register_csrf'])) {
+        http_response_code(403);
+        die('Invalid request');
+    }
+
     $first_name = trim($_POST['first_name'] ?? '');
     $last_name  = trim($_POST['last_name']  ?? '');
     $phone      = trim($_POST['phone']      ?? '');
@@ -24,8 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($first_name === '') $errors[] = t('กรุณากรอกชื่อ', 'Please enter first name');
     if ($last_name  === '') $errors[] = t('กรุณากรอกนามสกุล', 'Please enter last name');
-    if ($phone !== '' && !preg_match('/^\+?[0-9\-\s]{7,20}$/', $phone)) {
-        $errors[] = t('รูปแบบเบอร์โทรไม่ถูกต้อง', 'Invalid phone number format');
+    if ($phone === '') {
+        $errors[] = t('กรุณากรอกเบอร์โทรศัพท์', 'Please enter your phone number');
+    } elseif (!preg_match('/^[0-9]+$/', $phone)) {
+        $errors[] = t('เบอร์โทรศัพท์ต้องเป็นตัวเลขเท่านั้น', 'Phone number must contain digits only');
+    } elseif (strlen($phone) !== 10) {
+        $errors[] = t('เบอร์โทรศัพท์ต้องมี 10 หลักพอดี', 'Phone number must be exactly 10 digits');
     }
     if ($email === '') {
         $errors[] = t('กรุณากรอกอีเมล', 'Please enter email');
@@ -40,10 +53,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password === '') {
         $errors[] = t('กรุณากรอกรหัสผ่าน', 'Please enter a password');
     } else {
-        if (strlen($password) < 8) {
+        // Separate checks (not elseif) so the user sees every missing requirement at once,
+        // matching the live checklist rendered under the password field.
+        if (mb_strlen($password) < 8) {
             $errors[] = t('รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร', 'Password must be at least 8 characters');
-        } elseif (!preg_match('/[a-zA-Z]/', $password) || !preg_match('/[0-9]/', $password)) {
-            $errors[] = t('รหัสผ่านต้องมีทั้งตัวอักษรและตัวเลข', 'Password must contain both letters and numbers');
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            $errors[] = t('รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว', 'Password must contain at least one number');
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            $errors[] = t('รหัสผ่านต้องมีตัวพิมพ์เล็กอย่างน้อย 1 ตัว', 'Password must contain at least one lowercase letter');
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = t('รหัสผ่านต้องมีตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว', 'Password must contain at least one uppercase letter');
         }
     }
     if ($confirm === '') {
@@ -116,6 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="bg-white rounded-xl border border-[#e8e4df] p-8">
                 <form method="POST" novalidate class="space-y-4">
+                    <input type="hidden" name="_register_csrf" value="<?= htmlspecialchars($_SESSION['_register_csrf']) ?>">
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -131,9 +154,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-[#6b5f52] mb-1.5"><?= t('เบอร์โทรศัพท์','Phone Number') ?></label>
-                        <input type="tel" name="phone" value="<?= htmlspecialchars($old['phone'] ?? '') ?>"
-                               class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                        <label class="block text-xs font-medium text-[#6b5f52] mb-1.5"><?= t('เบอร์โทรศัพท์','Phone Number') ?> *</label>
+                        <input type="tel" name="phone" inputmode="numeric" value="<?= htmlspecialchars($old['phone'] ?? '') ?>"
+                               class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]" required>
                     </div>
 
                     <div>
@@ -151,16 +174,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div>
                         <label class="block text-xs font-medium text-[#6b5f52] mb-1.5"><?= t('รหัสผ่าน','Password') ?> *</label>
-                        <input type="password" name="password" id="password"
-                               placeholder="<?= t('อย่างน้อย 8 ตัว มีตัวอักษรและตัวเลข','Min 8 chars with letters and numbers') ?>"
+                        <input type="password" name="password" id="password" data-pw-rules="pw-rules"
                                class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]" required>
+                        <ul id="pw-rules" class="text-xs text-[#9d8f82] mt-2 space-y-1">
+                            <li data-pw-rule="len"><span data-pw-mark>•</span> <?= t('อย่างน้อย 8 ตัวอักษร','At least 8 characters') ?></li>
+                            <li data-pw-rule="digit"><span data-pw-mark>•</span> <?= t('มีตัวเลขอย่างน้อย 1 ตัว (0-9)','At least one number (0-9)') ?></li>
+                            <li data-pw-rule="lower"><span data-pw-mark>•</span> <?= t('มีตัวพิมพ์เล็กอย่างน้อย 1 ตัว (a-z)','At least one lowercase letter (a-z)') ?></li>
+                            <li data-pw-rule="upper"><span data-pw-mark>•</span> <?= t('มีตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว (A-Z)','At least one uppercase letter (A-Z)') ?></li>
+                        </ul>
                     </div>
 
                     <div>
                         <label class="block text-xs font-medium text-[#6b5f52] mb-1.5"><?= t('ยืนยันรหัสผ่าน','Confirm Password') ?> *</label>
-                        <input type="password" name="confirm_password" id="confirm_password"
+                        <input type="password" name="confirm_password" id="confirm_password" data-pw-match="password"
                                class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]" required>
-                        <p id="pw-match-msg" class="text-xs mt-1 hidden"></p>
                     </div>
 
                     <button type="submit"
@@ -183,23 +210,113 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include('components/footer.php'); ?>
 
     <script src="https://unpkg.com/feather-icons"></script>
+    <script>feather.replace();</script>
+    <?php include('components/password-script.php'); ?>
+
     <script>
-        feather.replace();
-        // Live confirm password check
-        const pwField      = document.getElementById('password');
-        const confirmField = document.getElementById('confirm_password');
-        const matchMsg     = document.getElementById('pw-match-msg');
-        function checkMatch() {
-            if (!confirmField.value) { matchMsg.classList.add('hidden'); return; }
-            const ok = pwField.value === confirmField.value;
-            matchMsg.classList.remove('hidden', 'text-red-500', 'text-green-600');
-            matchMsg.classList.add(ok ? 'text-green-600' : 'text-red-500');
-            matchMsg.textContent = ok
-                ? '<?= t('รหัสผ่านตรงกัน','Passwords match') ?>'
-                : '<?= t('รหัสผ่านไม่ตรงกัน','Passwords do not match') ?>';
+    /* Keep a local draft of the registration form so a visitor who leaves and comes back
+       does not have to retype everything. Passwords are never stored. */
+    (function () {
+        var KEY     = 'invez_register_draft';
+        var MAX_AGE = 24 * 60 * 60 * 1000;   /* drop drafts older than a day */
+        var FIELDS  = ['first_name', 'last_name', 'phone', 'email', 'username'];
+
+        var store;
+        try {
+            store = window.localStorage;
+            store.setItem(KEY + '_probe', '1');
+            store.removeItem(KEY + '_probe');
+        } catch (e) {
+            return;                          /* private mode / storage disabled */
         }
-        confirmField?.addEventListener('input', checkMatch);
-        pwField?.addEventListener('input', checkMatch);
+
+<?php if ($success): ?>
+        store.removeItem(KEY);               /* registered successfully — draft no longer needed */
+<?php else: ?>
+        var form = document.querySelector('form[method="POST"]');
+        if (!form) return;
+
+        var inputs = [];
+        for (var i = 0; i < FIELDS.length; i++) {
+            var el = form.querySelector('[name="' + FIELDS[i] + '"]');
+            if (el) inputs.push(el);
+        }
+
+        /* restore — only into fields the server left empty, so PHP's $old repopulation wins */
+        var draft = null;
+        try {
+            draft = JSON.parse(store.getItem(KEY));
+        } catch (e) {
+            store.removeItem(KEY);
+        }
+
+        if (draft && draft.t && (Date.now() - draft.t) < MAX_AGE) {
+            for (var j = 0; j < inputs.length; j++) {
+                if (!inputs[j].value && draft.v[inputs[j].name]) {
+                    inputs[j].value = draft.v[inputs[j].name];
+                }
+            }
+        } else if (draft) {
+            store.removeItem(KEY);
+        }
+
+        /* save */
+        function save() {
+            var values = {};
+            for (var k = 0; k < inputs.length; k++) values[inputs[k].name] = inputs[k].value;
+            store.setItem(KEY, JSON.stringify({ t: Date.now(), v: values }));
+        }
+
+        for (var m = 0; m < inputs.length; m++) {
+            inputs[m].addEventListener('input', save);
+        }
+<?php endif; ?>
+    })();
+
+    /* Live phone validation — required, digits only, exactly 10. Mirrors the server-side rule
+       in this file. Runs after the draft restore above so a restored value is checked on load. */
+    (function () {
+        var input = document.querySelector('[name="phone"]');
+        if (!input) return;
+
+        var REQUIRED    = <?= json_encode(t('กรุณากรอกเบอร์โทรศัพท์', 'Please enter your phone number'), JSON_UNESCAPED_UNICODE) ?>;
+        var ONLY_DIGITS = <?= json_encode(t('เบอร์โทรศัพท์ต้องเป็นตัวเลขเท่านั้น', 'Phone number must contain digits only'), JSON_UNESCAPED_UNICODE) ?>;
+        var BAD_LENGTH  = <?= json_encode(t('เบอร์โทรศัพท์ต้องมี 10 หลักพอดี', 'Phone number must be exactly 10 digits'), JSON_UNESCAPED_UNICODE) ?>;
+
+        var msg = document.createElement('p');
+        msg.style.cssText = 'font-size:0.75rem;line-height:1rem;margin-top:0.25rem;color:#ef4444;display:none;';
+        input.parentNode.insertBefore(msg, input.nextSibling);
+
+        /* Don't nag about an empty field before the visitor has touched it —
+           the "required" error only appears once they've typed in it or left it. */
+        var touched = false;
+
+        function check() {
+            var value = input.value;
+            var error = '';
+
+            if (value === '') {
+                if (touched)                error = REQUIRED;
+            } else if (!/^[0-9]+$/.test(value)) {
+                                            error = ONLY_DIGITS;
+            } else if (value.length !== 10) {
+                                            error = BAD_LENGTH;
+            }
+
+            msg.textContent         = error;
+            msg.style.display       = error ? 'block' : 'none';
+            input.style.borderColor = error ? '#ef4444' : '';
+        }
+
+        function touch() { touched = true; check(); }
+
+        input.addEventListener('input', touch);
+        input.addEventListener('blur', touch);
+        check();
+    })();
     </script>
+
+    <?php /* after the draft restore above, so a restored email is validated on load too */ ?>
+    <?php include('components/email-script.php'); ?>
 </body>
 </html>

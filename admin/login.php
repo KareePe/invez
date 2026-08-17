@@ -1,15 +1,8 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    ini_set('display_errors', 0);
-    session_set_cookie_params([
-        'httponly' => true,
-        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
-        'samesite' => 'Lax',
-    ]);
-    session_start();
-}
+require_once(__DIR__ . '/../config/session.php');
 
 require_once('../config/db.php');
+require_once('../config/login-throttle.php');
 
 if (!empty($_SESSION['admin_id'])) {
     header('Location: index');
@@ -31,7 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if ($username === '' || $password === '') {
+    if (login_is_blocked('admin')) {
+        // Checked before any password work so a blocked IP cannot keep probing.
+        $error = 'พยายามเข้าสู่ระบบผิดหลายครั้งเกินไป กรุณาลองใหม่อีกครั้งใน 24 ชั่วโมง';
+    } elseif ($username === '' || $password === '') {
         $error = 'กรุณากรอก username และ password';
     } else {
         $stmt = db()->prepare('SELECT id, name, password FROM admins WHERE username = ? LIMIT 1');
@@ -39,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch();
 
         if ($admin && password_verify($password, $admin['password'])) {
+            login_clear_failures('admin');
             session_regenerate_id(true);
             $_SESSION['admin_id']       = $admin['id'];
             $_SESSION['admin_name']     = $admin['name'];
@@ -46,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: index');
             exit;
         }
+        login_record_failure('admin');
         $error = 'username หรือ password ไม่ถูกต้อง';
     }
 }
@@ -95,5 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
+<?php include('../components/password-script.php'); ?>
 </body>
 </html>

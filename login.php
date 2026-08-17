@@ -2,6 +2,7 @@
 $current_page = 'login';
 require_once('config/lang.php');
 require_once('config/db.php');
+require_once('config/login-throttle.php');
 
 if (!empty($_SESSION['member_id'])) {
     header('Location: /');
@@ -23,7 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if ($username === '' || $password === '') {
+    if (login_is_blocked('member')) {
+        // Checked before any password work so a blocked IP cannot keep probing.
+        $error = t('พยายามเข้าสู่ระบบผิดหลายครั้งเกินไป กรุณาลองใหม่อีกครั้งใน 24 ชั่วโมง',
+                   'Too many failed login attempts. Please try again in 24 hours.');
+    } elseif ($username === '' || $password === '') {
         $error = t('กรุณากรอกชื่อผู้ใช้งานและรหัสผ่าน', 'Please enter username and password');
     } else {
         $stmt = db()->prepare(
@@ -33,12 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $member = $stmt->fetch();
 
         if (!$member || !password_verify($password, $member['password_hash'])) {
+            login_record_failure('member');
             $error = t('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง', 'Incorrect username or password');
         } elseif ($member['status'] === 'pending') {
             $error = t('บัญชีของคุณยังรอการยืนยันจากแอดมิน', 'Your account is awaiting admin approval');
         } elseif ($member['status'] === 'rejected') {
             $error = t('บัญชีของคุณถูกปฏิเสธ กรุณาติดต่อแอดมิน', 'Your account has been rejected. Please contact admin');
         } else {
+            login_clear_failures('member');
             session_regenerate_id(true);
             $_SESSION['member_id']       = $member['id'];
             $_SESSION['member_name']     = $member['first_name'] . ' ' . $member['last_name'];
@@ -92,7 +99,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-[#6b5f52] mb-1.5"><?= t('รหัสผ่าน','Password') ?></label>
+                        <div class="flex items-baseline justify-between mb-1.5">
+                            <label class="block text-xs font-medium text-[#6b5f52]"><?= t('รหัสผ่าน','Password') ?></label>
+                            <a href="/forgot-password" class="text-xs text-[#c9a96e] hover:text-[#b8965e] font-medium"><?= t('ลืมรหัสผ่าน?','Forgot password?') ?></a>
+                        </div>
                         <input type="password" name="password"
                                class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]"
                                autocomplete="current-password" required>
@@ -117,5 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="https://unpkg.com/feather-icons"></script>
     <script>feather.replace();</script>
+    <?php include('components/password-script.php'); ?>
 </body>
 </html>
