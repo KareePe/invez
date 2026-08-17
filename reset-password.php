@@ -22,8 +22,10 @@ $reset   = null;
 // Look the token up first — everything below depends on it being usable.
 if ($token !== '' && preg_match('/^[a-f0-9]{64}$/', $token)) {
     $stmt = db()->prepare(
-        'SELECT id, member_id FROM password_resets
-         WHERE token_hash = ? AND used_at IS NULL AND expires_at > NOW()
+        'SELECT pr.id, pr.member_id, m.email
+         FROM password_resets pr
+         JOIN members m ON m.id = pr.member_id
+         WHERE pr.token_hash = ? AND pr.used_at IS NULL AND pr.expires_at > NOW()
          LIMIT 1'
     );
     $stmt->execute([hash('sha256', $token)]);
@@ -36,8 +38,17 @@ if ($reset && $_SERVER['REQUEST_METHOD'] === 'POST') {
         die('Invalid request');
     }
 
+    $email    = trim($_POST['email']       ?? '');
     $password = $_POST['password']         ?? '';
     $confirm  = $_POST['confirm_password'] ?? '';
+
+    // The address is confirmed against the account the token belongs to, so a link
+    // that reaches the wrong inbox cannot be used by whoever received it.
+    if ($email === '') {
+        $errors[] = t('กรุณากรอกอีเมล', 'Please enter your email');
+    } elseif (!hash_equals(mb_strtolower($reset['email']), mb_strtolower($email))) {
+        $errors[] = t('อีเมลไม่ตรงกับบัญชีของลิงก์นี้', 'This email does not match the account for this link');
+    }
 
     // Same rules as register.php — separate checks so every missing requirement shows at once.
     if ($password === '') {
@@ -137,10 +148,19 @@ if ($reset && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
 
                     <div>
+                        <label class="block text-xs font-medium text-[#6b5f52] mb-1.5"><?= t('อีเมล','Email') ?> *</label>
+                        <input type="email" name="email"
+                               value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                               placeholder="<?= t('อีเมลที่ใช้ขอลิงก์นี้','The email this link was sent to') ?>"
+                               class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]"
+                               autocomplete="email" autofocus required>
+                    </div>
+
+                    <div>
                         <label class="block text-xs font-medium text-[#6b5f52] mb-1.5"><?= t('รหัสผ่านใหม่','New Password') ?> *</label>
                         <input type="password" name="password" id="password" data-pw-rules="pw-rules"
                                class="w-full border border-[#e0dbd4] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]"
-                               autocomplete="new-password" autofocus required>
+                               autocomplete="new-password" required>
                         <ul id="pw-rules" class="text-xs text-[#9d8f82] mt-2 space-y-1">
                             <li data-pw-rule="len"><span data-pw-mark>•</span> <?= t('อย่างน้อย 8 ตัวอักษร','At least 8 characters') ?></li>
                             <li data-pw-rule="digit"><span data-pw-mark>•</span> <?= t('มีตัวเลขอย่างน้อย 1 ตัว (0-9)','At least one number (0-9)') ?></li>
@@ -173,5 +193,6 @@ if ($reset && $_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://unpkg.com/feather-icons"></script>
     <script>feather.replace();</script>
     <?php include('components/password-script.php'); ?>
+    <?php include('components/email-script.php'); ?>
 </body>
 </html>
