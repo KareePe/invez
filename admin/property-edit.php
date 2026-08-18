@@ -38,7 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category          = trim($_POST['category'] ?? '');
     $subtitle          = trim($_POST['subtitle'] ?? '');
     $subtitle_en       = trim($_POST['subtitle_en'] ?? '');
-    $price             = $_POST['price'] !== '' ? (int)$_POST['price'] : null;
+    // The price field posts grouped digits ("15,000,000") from the formatted input.
+    $price_raw         = preg_replace('/\D/', '', (string)($_POST['price'] ?? ''));
+    $price             = $price_raw !== '' ? (int)$price_raw : null;
     $price_display     = trim($_POST['price_display'] ?? '');
     // Deposit ratio shown on the checkout page. Empty or out of range = not set,
     // and checkout falls back to its own 10% default.
@@ -273,7 +275,10 @@ include('_header.php');
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">ราคา (ตัวเลข, บาท)</label>
-                        <input type="number" name="price" value="<?= $prop['price'] ?? '' ?>"
+                        <?php $price_value = preg_replace('/\D/', '', (string)($prop['price'] ?? '')); ?>
+                        <input type="text" name="price" inputmode="numeric" autocomplete="off"
+                               value="<?= $price_value !== '' ? number_format((int)$price_value) : '' ?>"
+                               id="price-input"
                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
                     </div>
                     <div>
@@ -492,6 +497,12 @@ document.querySelectorAll('.lang-tab-btn').forEach(btn => {
 <script>
     // Keep unsaved edits per property (or "new" for a fresh record).
     initFormDraft(document.getElementById('property-form'), 'invez.property-draft.admin.<?= $is_new ? 'new' : $id ?>');
+</script>
+
+<script src="<?= $_base_path ?>/assets/js/price-input.js"></script>
+<script>
+    // After the draft restore above, so a restored price is grouped too.
+    initPriceInput(document.getElementById('price-input'));
 </script>
 
 <?php include('_footer.php'); ?>
