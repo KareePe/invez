@@ -170,7 +170,7 @@ include('_header.php');
 </div>
 <?php endif; ?>
 
-<form method="POST" enctype="multipart/form-data" class="space-y-5" id="property-form">
+<form method="POST" data-loading="button" enctype="multipart/form-data" class="space-y-5" id="property-form">
     <input type="hidden" name="csrf_token" value="<?= member_csrf_token() ?>">
 
     <div class="grid md:grid-cols-2 gap-5">

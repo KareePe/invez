@@ -91,7 +91,7 @@ include('_header.php');
 </div>
 <?php endif; ?>
 
-<form method="POST" class="space-y-5 max-w-2xl">
+<form method="POST" data-loading="button" class="space-y-5 max-w-2xl">
     <input type="hidden" name="csrf_token" value="<?= member_csrf_token() ?>">
 
     <div class="bg-white rounded-xl border border-[#e8e4df] p-5 space-y-4">

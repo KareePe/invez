@@ -193,7 +193,7 @@ include('_header.php');
 </div>
 <?php endif; ?>
 
-<form method="POST" enctype="multipart/form-data" class="space-y-6" id="property-form">
+<form method="POST" data-loading="button" enctype="multipart/form-data" class="space-y-6" id="property-form">
     <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
 
     <!-- Language tab switcher -->

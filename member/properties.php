@@ -68,7 +68,7 @@ include('_header.php');
                         <a href="property-edit?id=<?= $p['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800"><?= t('แก้ไข','Edit') ?></a>
                         <?php endif; ?>
                         <?php if ($p['approval_status'] !== 'approved'): ?>
-                        <form method="POST" action="property-edit?delete=1" data-confirm="<?= t('ลบทรัพย์สินนี้?','Delete this property?') ?>">
+                        <form method="POST" data-loading="overlay" action="property-edit?delete=1" data-confirm="<?= t('ลบทรัพย์สินนี้?','Delete this property?') ?>">
                             <input type="hidden" name="csrf_token" value="<?= member_csrf_token() ?>">
                             <input type="hidden" name="id" value="<?= $p['id'] ?>">
                             <button type="submit" class="text-xs text-red-500 hover:text-red-700"><?= t('ลบ','Delete') ?></button>

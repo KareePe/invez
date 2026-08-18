@@ -94,7 +94,7 @@ include('_header.php');
                     <td class="px-5 py-3 whitespace-nowrap">
                         <div class="flex items-center gap-2">
                             <?php if ($m['status'] !== 'approved'): ?>
-                            <form method="POST" action="member-status">
+                            <form method="POST" data-loading="overlay" action="member-status">
                                 <input type="hidden" name="id" value="<?= $m['id'] ?>">
                                 <input type="hidden" name="action" value="approve">
                                 <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
@@ -102,14 +102,14 @@ include('_header.php');
                             </form>
                             <?php endif; ?>
                             <?php if ($m['status'] !== 'rejected'): ?>
-                            <form method="POST" action="member-status">
+                            <form method="POST" data-loading="overlay" action="member-status">
                                 <input type="hidden" name="id" value="<?= $m['id'] ?>">
                                 <input type="hidden" name="action" value="reject">
                                 <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                                 <button type="submit" class="text-xs text-amber-600 hover:text-amber-800 font-medium">ปฏิเสธ</button>
                             </form>
                             <?php endif; ?>
-                            <form method="POST" action="member-status" data-confirm="ลบสมาชิกนี้?">
+                            <form method="POST" data-loading="overlay" action="member-status" data-confirm="ลบสมาชิกนี้?">
                                 <input type="hidden" name="id" value="<?= $m['id'] ?>">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">

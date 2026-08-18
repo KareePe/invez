@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <?php endif; ?>
 
-            <form method="POST">
+            <form method="POST" data-loading="button">
                 <input type="hidden" name="_login_csrf" value="<?= htmlspecialchars($_SESSION['_login_csrf']) ?>">
                 <div class="mb-5">
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
@@ -93,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
+<?php include('../components/loading-script.php'); ?>
 <?php include('../components/password-script.php'); ?>
 </body>
 </html>

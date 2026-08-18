@@ -111,14 +111,14 @@ include('_header.php');
                     <td class="px-5 py-3 whitespace-nowrap">
                         <div class="flex items-center gap-2">
                             <?php if ($filter === 'pending'): ?>
-                            <form method="POST" action="submission-approve">
+                            <form method="POST" data-loading="overlay" action="submission-approve">
                                 <input type="hidden" name="type" value="property">
                                 <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                 <input type="hidden" name="action" value="approve">
                                 <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                                 <button type="submit" class="text-xs text-green-600 hover:text-green-800 font-medium">อนุมัติ</button>
                             </form>
-                            <form method="POST" action="submission-approve">
+                            <form method="POST" data-loading="overlay" action="submission-approve">
                                 <input type="hidden" name="type" value="property">
                                 <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                 <input type="hidden" name="action" value="reject">
@@ -127,7 +127,7 @@ include('_header.php');
                             </form>
                             <?php endif; ?>
                             <a href="property-edit?id=<?= $p['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800">แก้ไข</a>
-                            <form method="POST" action="property-delete" data-confirm="ลบทรัพย์สินนี้?">
+                            <form method="POST" data-loading="overlay" action="property-delete" data-confirm="ลบทรัพย์สินนี้?">
                                 <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                 <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                                 <button type="submit" class="text-xs text-red-500 hover:text-red-700">ลบ</button>
