@@ -194,6 +194,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             class="w-full bg-[#c9a96e] hover:bg-[#b8965e] text-white font-semibold py-2.5 rounded-lg text-sm transition-colors mt-2">
                         <?= t('สมัครสมาชิก','Create Account') ?>
                     </button>
+
+                    <div class="mt-4 text-xs text-red-600 leading-relaxed space-y-1">
+                        <p><span class="font-semibold">*</span> <?= t('หมายเหตุ: เมื่อเกิดการซื้อขายทรัพย์สินผ่านเว็บไซต์ ผู้ลงประกาศตกลงชำระค่าคอมมิชชั่นให้แก่เจ้าของเว็บไซต์ในอัตราร้อยละ 3 ของราคาซื้อขาย','Note: Upon completion of a property sale arranged through this website, the lister agrees to pay the website owner a commission of 3% of the sale price.') ?></p>
+                        <p><span class="font-semibold">*</span> <?= t('หมายเหตุ: กรณีเกิดการให้เช่าตามสัญญาระยะเวลา 1 ปี เจ้าของเว็บไซต์จะได้รับค่าตอบแทนเทียบเท่าค่าเช่า 1 เดือน จากค่าเช่าทั้งหมด 12 เดือน','Note: In the case of a lease with a one-year term, the website owner shall receive compensation equivalent to one month of rent out of the twelve-month term.') ?></p>
+                    </div>
                 </form>
 
                 <p class="text-center text-xs text-[#9d8f82] mt-5">

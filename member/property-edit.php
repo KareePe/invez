@@ -62,6 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_GET['delete'])) {
     $subtitle    = trim($_POST['subtitle']    ?? '');
     $price       = $_POST['price'] !== '' ? (int)$_POST['price'] : null;
     $price_display = trim($_POST['price_display'] ?? '');
+    // Deposit ratio shown on the checkout page. Empty or out of range = not set,
+    // and checkout falls back to its own 10% default.
+    $deposit_percent = $_POST['deposit_percent'] !== '' ? (int)$_POST['deposit_percent'] : null;
+    if ($deposit_percent !== null && ($deposit_percent < 0 || $deposit_percent > 100)) {
+        $deposit_percent = null;
+    }
     $location    = trim($_POST['location']    ?? '');
     $location_short = trim($_POST['location_short'] ?? '');
     $land_area   = trim($_POST['land_area']   ?? '');
@@ -79,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_GET['delete'])) {
 
     if (empty($errors)) {
         $fields = [
-            $category, $title, $subtitle ?: null, $price, $price_display ?: null,
+            $category, $title, $subtitle ?: null, $price, $price_display ?: null, $deposit_percent,
             $location ?: null, $location_short ?: null,
             $land_area ?: null, $usable_area ?: null, $floors ?: null,
             $beds, $bathrooms, $parking ?: null, $offices,
@@ -89,16 +95,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_GET['delete'])) {
         if ($is_new) {
             db()->prepare(
                 'INSERT INTO properties
-                 (category,title,subtitle,price,price_display,location,location_short,
+                 (category,title,subtitle,price,price_display,deposit_percent,location,location_short,
                   land_area,usable_area,floors,beds,bathrooms,parking,offices,
                   status,description,is_active,submitted_by,approval_status)
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,\'pending\')'
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,\'pending\')'
             )->execute(array_merge($fields, [$_SESSION['member_id']]));
             $id = (int)db()->lastInsertId();
         } else {
             db()->prepare(
                 'UPDATE properties SET
-                 category=?,title=?,subtitle=?,price=?,price_display=?,location=?,location_short=?,
+                 category=?,title=?,subtitle=?,price=?,price_display=?,deposit_percent=?,location=?,location_short=?,
                  land_area=?,usable_area=?,floors=?,beds=?,bathrooms=?,parking=?,offices=?,
                  status=?,description=?
                  WHERE id=? AND submitted_by=?'
@@ -164,7 +170,7 @@ include('_header.php');
 </div>
 <?php endif; ?>
 
-<form method="POST" enctype="multipart/form-data" class="space-y-5">
+<form method="POST" enctype="multipart/form-data" class="space-y-5" id="property-form">
     <input type="hidden" name="csrf_token" value="<?= member_csrf_token() ?>">
 
     <div class="grid md:grid-cols-2 gap-5">
@@ -214,6 +220,14 @@ include('_header.php');
                     <input type="text" name="price_display" value="<?= htmlspecialchars($prop['price_display'] ?? '') ?>"
                            placeholder="<?= t('เช่น 15 ล้านบาท','e.g. 15 million THB') ?>"
                            class="w-full border border-[#e0dbd4] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-[#6b5f52] mb-1.5"><?= t('สัดส่วนมัดจำ (%)','Deposit Percentage (%)') ?></label>
+                    <input type="number" name="deposit_percent" min="0" max="100" step="1"
+                           value="<?= htmlspecialchars((string)($prop['deposit_percent'] ?? '')) ?>"
+                           placeholder="10"
+                           class="w-full border border-[#e0dbd4] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                    <p class="text-xs text-[#9d8f82] mt-1"><?= t('ใช้เป็นค่าเริ่มต้นของสัดส่วนมัดจำในหน้าชำระเงิน หากไม่ระบุจะใช้ 10%','Used as the default deposit percentage on the checkout page. Defaults to 10% if left blank.') ?></p>
                 </div>
             </div>
 
@@ -321,6 +335,11 @@ include('_header.php');
         </button>
         <a href="properties" class="text-sm text-[#9d8f82] hover:text-[#6b5f52]"><?= t('ยกเลิก','Cancel') ?></a>
     </div>
+
+    <div class="mt-4 text-xs text-red-600 leading-relaxed space-y-1">
+        <p><span class="font-semibold">*</span> <?= t('หมายเหตุ: เมื่อเกิดการซื้อขายทรัพย์สินผ่านเว็บไซต์ ผู้ลงประกาศตกลงชำระค่าคอมมิชชั่นให้แก่เจ้าของเว็บไซต์ในอัตราร้อยละ 3 ของราคาซื้อขาย','Note: Upon completion of a property sale arranged through this website, the lister agrees to pay the website owner a commission of 3% of the sale price.') ?></p>
+        <p><span class="font-semibold">*</span> <?= t('หมายเหตุ: กรณีเกิดการให้เช่าตามสัญญาระยะเวลา 1 ปี เจ้าของเว็บไซต์จะได้รับค่าตอบแทนเทียบเท่าค่าเช่า 1 เดือน จากค่าเช่าทั้งหมด 12 เดือน','Note: In the case of a lease with a one-year term, the website owner shall receive compensation equivalent to one month of rent out of the twelve-month term.') ?></p>
+    </div>
 </form>
 
 <script>
@@ -334,6 +353,12 @@ function addHighlight() {
     document.getElementById('highlights-list').appendChild(row);
     row.querySelector('input').focus();
 }
+</script>
+
+<script src="<?= $_member_base ?>/assets/js/form-draft.js"></script>
+<script>
+    // Keep unsaved edits per property (or "new" for a fresh submission).
+    initFormDraft(document.getElementById('property-form'), 'invez.property-draft.member.<?= $is_new ? 'new' : $id ?>');
 </script>
 
 <?php include('_footer.php'); ?>

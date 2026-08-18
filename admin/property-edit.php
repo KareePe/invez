@@ -40,6 +40,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subtitle_en       = trim($_POST['subtitle_en'] ?? '');
     $price             = $_POST['price'] !== '' ? (int)$_POST['price'] : null;
     $price_display     = trim($_POST['price_display'] ?? '');
+    // Deposit ratio shown on the checkout page. Empty or out of range = not set,
+    // and checkout falls back to its own 10% default.
+    $deposit_percent   = $_POST['deposit_percent'] !== '' ? (int)$_POST['deposit_percent'] : null;
+    if ($deposit_percent !== null && ($deposit_percent < 0 || $deposit_percent > 100)) {
+        $deposit_percent = null;
+    }
     $location          = trim($_POST['location'] ?? '');
     $location_en       = trim($_POST['location_en'] ?? '');
     $location_short    = trim($_POST['location_short'] ?? '');
@@ -66,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $category,
             $title, $title_en ?: null,
             $subtitle ?: null, $subtitle_en ?: null,
-            $price, $price_display ?: null,
+            $price, $price_display ?: null, $deposit_percent,
             $location ?: null, $location_en ?: null,
             $location_short ?: null, $location_short_en ?: null,
             $land_area ?: null, $usable_area ?: null, $floors ?: null,
@@ -79,11 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($is_new) {
             $stmt = db()->prepare(
                 'INSERT INTO properties
-                 (category,title,title_en,subtitle,subtitle_en,price,price_display,
+                 (category,title,title_en,subtitle,subtitle_en,price,price_display,deposit_percent,
                   location,location_en,location_short,location_short_en,
                   land_area,usable_area,floors,beds,bathrooms,parking,offices,
                   status,status_en,description,description_en,sort_order,is_active)
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->execute($fields);
             $id = (int)db()->lastInsertId();
@@ -92,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $stmt = db()->prepare(
                 'UPDATE properties SET
-                 category=?,title=?,title_en=?,subtitle=?,subtitle_en=?,price=?,price_display=?,
+                 category=?,title=?,title_en=?,subtitle=?,subtitle_en=?,price=?,price_display=?,deposit_percent=?,
                  location=?,location_en=?,location_short=?,location_short_en=?,
                  land_area=?,usable_area=?,floors=?,beds=?,bathrooms=?,parking=?,offices=?,
                  status=?,status_en=?,description=?,description_en=?,sort_order=?,is_active=?
@@ -187,7 +193,7 @@ include('_header.php');
 </div>
 <?php endif; ?>
 
-<form method="POST" enctype="multipart/form-data" class="space-y-6">
+<form method="POST" enctype="multipart/form-data" class="space-y-6" id="property-form">
     <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
 
     <!-- Language tab switcher -->
@@ -275,6 +281,14 @@ include('_header.php');
                         <input type="text" name="price_display" value="<?= htmlspecialchars($prop['price_display'] ?? '') ?>"
                                placeholder="เช่น 15 ล้านบาท"
                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">สัดส่วนมัดจำ (%)</label>
+                        <input type="number" name="deposit_percent" min="0" max="100" step="1"
+                               value="<?= htmlspecialchars((string)($prop['deposit_percent'] ?? '')) ?>"
+                               placeholder="10"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                        <p class="text-xs text-gray-500 mt-1">ใช้เป็นค่าเริ่มต้นของสัดส่วนมัดจำในหน้าชำระเงิน หากไม่ระบุจะใช้ 10%</p>
                     </div>
                 </div>
             </div>
@@ -472,6 +486,12 @@ document.querySelectorAll('.lang-tab-btn').forEach(btn => {
         });
     });
 });
+</script>
+
+<script src="<?= $_base_path ?>/assets/js/form-draft.js"></script>
+<script>
+    // Keep unsaved edits per property (or "new" for a fresh record).
+    initFormDraft(document.getElementById('property-form'), 'invez.property-draft.admin.<?= $is_new ? 'new' : $id ?>');
 </script>
 
 <?php include('_footer.php'); ?>
