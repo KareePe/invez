@@ -20,5 +20,7 @@ document.querySelectorAll('form[data-confirm]').forEach(form => {
     });
 });
 </script>
+<?php /* no password fields remain under member/ — password changes go through /forgot-password */ ?>
+<?php include('../components/email-script.php'); ?>
 </body>
 </html>

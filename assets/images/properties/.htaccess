@@ -1,0 +1,13 @@
+# Uploaded images are served from here, so the directory stays readable —
+# but nothing in it may ever be executed. The upload code already derives the
+# extension from the sniffed MIME type; this is the second line of defence.
+Options -Indexes -ExecCGI
+
+<FilesMatch "\.(php|phtml|php[0-9]|phar|cgi|pl|py|sh|htaccess)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>

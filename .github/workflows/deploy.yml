@@ -18,13 +18,26 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Create .env from secrets
+        # Quoted heredoc delimiter: GitHub substitutes ${{ secrets.* }} before the
+        # shell runs, so quoting stops a $ or backtick inside a secret from being
+        # expanded away when the file is written.
         run: |
-          cat > .env << EOF
+          cat > .env << 'EOF'
           DB_HOST=${{ secrets.DB_HOST }}
           DB_NAME=${{ secrets.DB_NAME }}
           DB_USER=${{ secrets.DB_USER }}
           DB_PASS=${{ secrets.DB_PASS }}
           DB_CHARSET=utf8mb4
+
+          # Production domain. Reset-password links in outgoing mail are built from
+          # this, never from the Host header, so it must match the live site exactly.
+          APP_URL=https://invez.biz
+
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=465
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASS="${{ secrets.SMTP_PASS }}"
+          SMTP_FROM_NAME=INVEZ
           EOF
 
       - name: Deploy Production via FTP
@@ -51,13 +64,24 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Create .env from secrets
+        # See the production job for why the heredoc delimiter is quoted.
         run: |
-          cat > .env << EOF
+          cat > .env << 'EOF'
           DB_HOST=${{ secrets.DB_UAT_HOST }}
           DB_NAME=${{ secrets.DB_UAT_NAME }}
           DB_USER=${{ secrets.DB_UAT_USER }}
           DB_PASS=${{ secrets.DB_UAT_PASS }}
           DB_CHARSET=utf8mb4
+
+          # UAT domain — the one difference from production. A reset link built with
+          # the production URL would point at a site whose database has no such token.
+          APP_URL=https://uat.invez.biz
+
+          SMTP_HOST=${{ secrets.SMTP_HOST_UAT }}
+          SMTP_PORT=465
+          SMTP_USER=${{ secrets.SMTP_USER_UAT }}
+          SMTP_PASS="${{ secrets.SMTP_PASS_UAT }}"
+          SMTP_FROM_NAME=INVEZ
           EOF
 
       - name: Deploy UAT via FTP

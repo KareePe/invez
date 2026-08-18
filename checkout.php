@@ -61,9 +61,15 @@ if (empty($_SESSION['csrf_checkout'])) {
 }
 $csrf = $_SESSION['csrf_checkout'];
 
+// Deposit ratio set on the property record; 10% when unset or out of range.
+$default_percent = (int)($p['deposit_percent'] ?? 0);
+if ($default_percent < 1 || $default_percent > 100) {
+    $default_percent = 10;
+}
+
 $success        = false;
 $error          = '';
-$posted_percent = 10;
+$posted_percent = $default_percent;
 $posted_bank    = '';
 
 // Handle POST

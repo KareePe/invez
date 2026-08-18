@@ -6,6 +6,21 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
+# Block the git directory — a readable .git lets anyone download the whole
+# repository and its history. RedirectMatch (mod_alias) is used instead of a
+# <Directory>/Require block so it works the same on Apache 2.2 and 2.4.
+# The (/|$) keeps it from catching unrelated names such as .gitkeep.
+RedirectMatch 404 /\.git(/|$)
+
+# Security headers. No Content-Security-Policy yet: the pages load Tailwind and
+# feather-icons from CDNs and run inline scripts, so a policy would have to be
+# designed around those rather than dropped in.
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
 RewriteEngine On
 
 # Trailing slash removal (except root)
@@ -24,6 +39,8 @@ RewriteRule ^ - [L]
 RewriteRule ^lang$               lang.php        [L,QSA]
 RewriteRule ^register$           register.php    [L]
 RewriteRule ^login$              login.php       [L]
+RewriteRule ^forgot-password$    forgot-password.php [L]
+RewriteRule ^reset-password$     reset-password.php  [L,QSA]
 RewriteRule ^logout$             logout.php      [L]
 RewriteRule ^about$              about.php       [L]
 RewriteRule ^portfolio$          portfolio.php   [L,QSA]

@@ -30,5 +30,7 @@ document.querySelectorAll('form[data-confirm]').forEach(form => {
 });
 </script>
 
+<?php include('../components/password-script.php'); ?>
+
 </body>
 </html>

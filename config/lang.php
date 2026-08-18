@@ -1,13 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    ini_set('display_errors', 0);
-    session_set_cookie_params([
-        'httponly' => true,
-        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
-        'samesite' => 'Lax',
-    ]);
-    session_start();
-}
+require_once(__DIR__ . '/session.php');
 if (!isset($_SESSION['lang'])) $_SESSION['lang'] = 'th';
 
 function lang(): string { return $_SESSION['lang'] ?? 'th'; }
