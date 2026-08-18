@@ -65,7 +65,7 @@ include('_header.php');
                         <a href="article-edit?id=<?= $a['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800"><?= t('แก้ไข','Edit') ?></a>
                         <?php endif; ?>
                         <?php if ($a['approval_status'] !== 'approved'): ?>
-                        <form method="POST" action="article-edit?delete=1" data-confirm="<?= t('ลบบทความนี้?','Delete this article?') ?>">
+                        <form method="POST" data-loading="overlay" action="article-edit?delete=1" data-confirm="<?= t('ลบบทความนี้?','Delete this article?') ?>">
                             <input type="hidden" name="csrf_token" value="<?= member_csrf_token() ?>">
                             <input type="hidden" name="id" value="<?= $a['id'] ?>">
                             <button type="submit" class="text-xs text-red-500 hover:text-red-700"><?= t('ลบ','Delete') ?></button>

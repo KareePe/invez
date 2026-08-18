@@ -105,7 +105,7 @@ include('_header.php');
 </div>
 <?php endif; ?>
 
-<form method="POST" class="space-y-5 max-w-3xl">
+<form method="POST" data-loading="button" class="space-y-5 max-w-3xl">
     <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
 
     <!-- Language tab switcher -->

@@ -16,11 +16,16 @@ document.querySelectorAll('form[data-confirm]').forEach(form => {
             reverseButtons: true,
             buttonsStyling: false,
             customClass: { popup:'swal-popup', confirmButton:'swal-confirm', cancelButton:'swal-cancel' },
-        }).then(r => { if (r.isConfirmed) self.submit(); });
+        }).then(r => {
+            if (!r.isConfirmed) return;
+            if (self.dataset.loading === 'overlay') window.showLoadingOverlay();
+            self.submit();
+        });
     });
 });
 </script>
 <?php /* no password fields remain under member/ — password changes go through /forgot-password */ ?>
+<?php include('../components/loading-script.php'); ?>
 <?php include('../components/email-script.php'); ?>
 </body>
 </html>

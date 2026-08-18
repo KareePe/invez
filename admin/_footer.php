@@ -24,12 +24,15 @@ document.querySelectorAll('form[data-confirm]').forEach(form => {
                 cancelButton:  'swal-cancel',
             },
         }).then(result => {
-            if (result.isConfirmed) self.submit();
+            if (!result.isConfirmed) return;
+            if (self.dataset.loading === 'overlay') window.showLoadingOverlay();
+            self.submit();
         });
     });
 });
 </script>
 
+<?php include('../components/loading-script.php'); ?>
 <?php include('../components/password-script.php'); ?>
 
 </body>

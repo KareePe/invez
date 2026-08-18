@@ -57,7 +57,7 @@ include('_header.php');
                     <td class="px-5 py-3 whitespace-nowrap">
                         <div class="flex items-center gap-3">
                             <a href="portfolio-edit?id=<?= $p['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800">แก้ไข</a>
-                            <form method="POST" action="portfolio-delete" data-confirm="ลบผลงานนี้?">
+                            <form method="POST" data-loading="overlay" action="portfolio-delete" data-confirm="ลบผลงานนี้?">
                                 <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                 <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                                 <button type="submit" class="text-xs text-red-500 hover:text-red-700">ลบ</button>

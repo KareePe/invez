@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <div class="bg-white rounded-xl border border-[#e8e4df] p-8">
-                <form method="POST" class="space-y-4">
+                <form method="POST" data-loading="button" class="space-y-4">
                     <input type="hidden" name="_login_csrf" value="<?= htmlspecialchars($_SESSION['_login_csrf']) ?>">
 
                     <div>
@@ -127,6 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="https://unpkg.com/feather-icons"></script>
     <script>feather.replace();</script>
+    <?php include('components/loading-script.php'); ?>
     <?php include('components/password-script.php'); ?>
 </body>
 </html>

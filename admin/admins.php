@@ -46,7 +46,7 @@ include('_header.php');
                             <?php else: ?>
                             <a href="admin-edit?id=<?= $a['id'] ?>" class="text-xs text-blue-600 hover:text-blue-800">แก้ไข</a>
                             <?php if ($a['id'] !== (int)$_SESSION['admin_id']): ?>
-                            <form method="POST" action="admin-delete" data-confirm="ลบแอดมินนี้?">
+                            <form method="POST" data-loading="overlay" action="admin-delete" data-confirm="ลบแอดมินนี้?">
                                 <input type="hidden" name="id" value="<?= $a['id'] ?>">
                                 <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                                 <button type="submit" class="text-xs text-red-500 hover:text-red-700">ลบ</button>
