@@ -3,7 +3,14 @@ $current_page = 'content';
 require_once('config/lang.php');
 require_once('config/db.php');
 
-$rows = db()->query('SELECT id, icon, category, title, title_en, excerpt, excerpt_en FROM articles WHERE is_active = 1 ORDER BY created_at DESC, id DESC')->fetchAll();
+// Sort — whitelist only, mapped to fixed ORDER BY clauses (never interpolate raw input)
+$sort_map = [
+    'newest' => 'created_at DESC, id DESC',
+    'oldest' => 'created_at ASC, id ASC',
+];
+$sort = isset($_GET['sort']) && isset($sort_map[$_GET['sort']]) ? $_GET['sort'] : 'newest';
+
+$rows = db()->query('SELECT id, icon, category, title, title_en, excerpt, excerpt_en FROM articles WHERE is_active = 1 ORDER BY ' . $sort_map[$sort])->fetchAll();
 $articles = [];
 foreach ($rows as $row) {
     $articles[$row['id']] = $row;
@@ -62,6 +69,12 @@ foreach ($rows as $row) {
     <!-- Articles Grid -->
     <section class="py-12 md:py-16 px-6 bg-white">
         <div class="max-w-6xl mx-auto">
+
+            <?php if (!empty($articles)): ?>
+            <div class="flex justify-end mb-8">
+                <?php include('components/sort-select.php'); ?>
+            </div>
+            <?php endif; ?>
 
             <div id="article-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <?php foreach ($articles as $id => $article): ?>
