@@ -15,7 +15,7 @@ if ($filter === 'all') {
                 p.status, p.status_en, p.land_area, p.beds, p.floors,
                 (SELECT GROUP_CONCAT(filename ORDER BY sort_order ASC SEPARATOR '|') FROM property_images WHERE property_id = p.id) AS images_csv
          FROM properties p WHERE p.is_active = 1
-         ORDER BY p.sort_order ASC, p.id ASC"
+         ORDER BY p.created_at DESC, p.id DESC"
     );
 } else {
     $stmt = db()->prepare(
@@ -24,7 +24,7 @@ if ($filter === 'all') {
                 p.status, p.status_en, p.land_area, p.beds, p.floors,
                 (SELECT GROUP_CONCAT(filename ORDER BY sort_order ASC SEPARATOR '|') FROM property_images WHERE property_id = p.id) AS images_csv
          FROM properties p WHERE p.is_active = 1 AND p.category = ?
-         ORDER BY p.sort_order ASC, p.id ASC"
+         ORDER BY p.created_at DESC, p.id DESC"
     );
     $stmt->execute([$filter]);
 }

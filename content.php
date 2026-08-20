@@ -3,7 +3,7 @@ $current_page = 'content';
 require_once('config/lang.php');
 require_once('config/db.php');
 
-$rows = db()->query('SELECT id, icon, category, title, title_en, excerpt, excerpt_en FROM articles WHERE is_active = 1 ORDER BY id ASC')->fetchAll();
+$rows = db()->query('SELECT id, icon, category, title, title_en, excerpt, excerpt_en FROM articles WHERE is_active = 1 ORDER BY created_at DESC, id DESC')->fetchAll();
 $articles = [];
 foreach ($rows as $row) {
     $articles[$row['id']] = $row;

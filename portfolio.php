@@ -10,7 +10,7 @@ $stmt = db()->query(
              FROM portfolio_images WHERE portfolio_id = p.id) AS images_csv
      FROM portfolios p
      WHERE p.is_active = 1
-     ORDER BY p.sort_order ASC, p.id ASC"
+     ORDER BY p.created_at DESC, p.id DESC"
 );
 $portfolios = $stmt->fetchAll();
 $total = count($portfolios);
