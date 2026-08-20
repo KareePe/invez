@@ -3,6 +3,13 @@ $current_page = 'portfolio';
 require_once('config/lang.php');
 require_once('config/db.php');
 
+// Sort — whitelist only, mapped to fixed ORDER BY clauses (never interpolate raw input)
+$sort_map = [
+    'newest' => 'p.created_at DESC, p.id DESC',
+    'oldest' => 'p.created_at ASC, p.id ASC',
+];
+$sort = isset($_GET['sort']) && isset($sort_map[$_GET['sort']]) ? $_GET['sort'] : 'newest';
+
 $stmt = db()->query(
     "SELECT p.id, p.category, p.category_en, p.title, p.title_en,
             p.description, p.description_en,
@@ -10,7 +17,7 @@ $stmt = db()->query(
              FROM portfolio_images WHERE portfolio_id = p.id) AS images_csv
      FROM portfolios p
      WHERE p.is_active = 1
-     ORDER BY p.sort_order ASC, p.id ASC"
+     ORDER BY {$sort_map[$sort]}"
 );
 $portfolios = $stmt->fetchAll();
 $total = count($portfolios);
@@ -68,6 +75,12 @@ $total = count($portfolios);
     <!-- Portfolio Grid -->
     <section class="py-12 md:py-16 px-6 bg-white">
         <div class="max-w-6xl mx-auto">
+
+            <?php if (!empty($portfolios)): ?>
+            <div class="flex justify-end mb-8">
+                <?php include('components/sort-select.php'); ?>
+            </div>
+            <?php endif; ?>
 
             <?php if (empty($portfolios)): ?>
             <div class="text-center py-20 text-[#9d8f82] text-sm">

@@ -8,6 +8,16 @@ $filter      = isset($_GET['cat']) ? $_GET['cat'] : 'all';
 $valid_cats  = array_merge(['all'], array_column($property_categories, 'id'));
 if (!in_array($filter, $valid_cats, true)) $filter = 'all';
 
+// Sort — whitelist only, mapped to fixed ORDER BY clauses (never interpolate raw input)
+$sort_map = [
+    'newest'     => 'p.created_at DESC, p.id DESC',
+    'oldest'     => 'p.created_at ASC, p.id ASC',
+    'price_low'  => '(p.price IS NULL OR p.price = 0) ASC, p.price ASC, p.id DESC',
+    'price_high' => 'p.price DESC, p.id DESC',
+];
+$sort = isset($_GET['sort']) && isset($sort_map[$_GET['sort']]) ? $_GET['sort'] : 'newest';
+$order_by = $sort_map[$sort];
+
 if ($filter === 'all') {
     $stmt = db()->query(
         "SELECT p.id, p.category, p.title, p.title_en, p.subtitle, p.subtitle_en,
@@ -15,7 +25,7 @@ if ($filter === 'all') {
                 p.status, p.status_en, p.land_area, p.beds, p.floors,
                 (SELECT GROUP_CONCAT(filename ORDER BY sort_order ASC SEPARATOR '|') FROM property_images WHERE property_id = p.id) AS images_csv
          FROM properties p WHERE p.is_active = 1
-         ORDER BY p.sort_order ASC, p.id ASC"
+         ORDER BY $order_by"
     );
 } else {
     $stmt = db()->prepare(
@@ -24,7 +34,7 @@ if ($filter === 'all') {
                 p.status, p.status_en, p.land_area, p.beds, p.floors,
                 (SELECT GROUP_CONCAT(filename ORDER BY sort_order ASC SEPARATOR '|') FROM property_images WHERE property_id = p.id) AS images_csv
          FROM properties p WHERE p.is_active = 1 AND p.category = ?
-         ORDER BY p.sort_order ASC, p.id ASC"
+         ORDER BY $order_by"
     );
     $stmt->execute([$filter]);
 }
@@ -91,21 +101,24 @@ $active_cats = array_keys($counts);
     <section class="py-12 md:py-16 px-6 bg-white">
         <div class="max-w-6xl mx-auto">
 
-            <!-- Filter tabs -->
-            <div class="flex flex-wrap gap-2 mb-10">
-                <a href="/properties"
+            <!-- Filter tabs + sort -->
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-10">
+            <div class="flex flex-wrap gap-2">
+                <a href="/properties<?= $sort !== 'newest' ? '?sort='.$sort : '' ?>"
                    class="px-3.5 py-1.5 rounded text-sm transition-colors duration-150
                           <?= $filter === 'all' ? 'bg-[#1a1714] text-white' : 'border border-[#e8e4df] text-[#6b5f52] hover:border-[#1a1714] hover:text-[#1a1714]' ?>">
                     <?= t('ทั้งหมด','All') ?> <span class="<?= $filter === 'all' ? 'text-white/70' : 'text-[#9d8f82]' ?>">(<?= $total ?>)</span>
                 </a>
                 <?php foreach ($property_categories as $cat):
                     if (!in_array($cat['id'], $active_cats, true)) continue; ?>
-                <a href="/properties?cat=<?= $cat['id'] ?>"
+                <a href="/properties?cat=<?= $cat['id'] ?><?= $sort !== 'newest' ? '&amp;sort='.$sort : '' ?>"
                    class="px-3.5 py-1.5 rounded text-sm transition-colors duration-150
                           <?= $filter === $cat['id'] ? 'bg-[#1a1714] text-white' : 'border border-[#e8e4df] text-[#6b5f52] hover:border-[#1a1714] hover:text-[#1a1714]' ?>">
                     <?= htmlspecialchars(get_category_label($property_categories, $cat['id'], lang())) ?> <span class="<?= $filter === $cat['id'] ? 'text-white/70' : 'text-[#9d8f82]' ?>">(<?= $counts[$cat['id']] ?>)</span>
                 </a>
                 <?php endforeach; ?>
+            </div>
+            <?php $sort_with_price = true; $sort_hidden = $filter !== 'all' ? ['cat' => $filter] : []; include('components/sort-select.php'); ?>
             </div>
 
             <!-- Property grid -->
