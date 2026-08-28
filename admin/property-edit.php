@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $price_raw         = preg_replace('/\D/', '', (string)($_POST['price'] ?? ''));
     $price             = $price_raw !== '' ? (int)$price_raw : null;
     $price_display     = trim($_POST['price_display'] ?? '');
+    $price_display_en  = trim($_POST['price_display_en'] ?? '');
     // Deposit ratio shown on the checkout page. Empty or out of range = not set,
     // and checkout falls back to its own 10% default.
     $deposit_percent   = $_POST['deposit_percent'] !== '' ? (int)$_POST['deposit_percent'] : null;
@@ -53,11 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $location_short    = trim($_POST['location_short'] ?? '');
     $location_short_en = trim($_POST['location_short_en'] ?? '');
     $land_area         = trim($_POST['land_area'] ?? '');
+    $land_area_en      = trim($_POST['land_area_en'] ?? '');
     $usable_area       = trim($_POST['usable_area'] ?? '');
+    $usable_area_en    = trim($_POST['usable_area_en'] ?? '');
     $floors            = trim($_POST['floors'] ?? '');
+    $floors_en         = trim($_POST['floors_en'] ?? '');
     $beds              = $_POST['beds'] !== '' ? (int)$_POST['beds'] : null;
     $bathrooms         = $_POST['bathrooms'] !== '' ? (int)$_POST['bathrooms'] : null;
     $parking           = trim($_POST['parking'] ?? '');
+    $parking_en        = trim($_POST['parking_en'] ?? '');
     $offices           = $_POST['offices'] !== '' ? (int)$_POST['offices'] : null;
     $status            = trim($_POST['status'] ?? '');
     $status_en         = trim($_POST['status_en'] ?? '');
@@ -74,11 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $category,
             $title, $title_en ?: null,
             $subtitle ?: null, $subtitle_en ?: null,
-            $price, $price_display ?: null, $deposit_percent,
+            $price, $price_display ?: null, $price_display_en ?: null, $deposit_percent,
             $location ?: null, $location_en ?: null,
             $location_short ?: null, $location_short_en ?: null,
-            $land_area ?: null, $usable_area ?: null, $floors ?: null,
-            $beds, $bathrooms, $parking ?: null, $offices,
+            $land_area ?: null, $land_area_en ?: null,
+            $usable_area ?: null, $usable_area_en ?: null,
+            $floors ?: null, $floors_en ?: null,
+            $beds, $bathrooms, $parking ?: null, $parking_en ?: null, $offices,
             $status ?: null, $status_en ?: null,
             $description ?: null, $description_en ?: null,
             $sort_order, $is_active,
@@ -87,11 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($is_new) {
             $stmt = db()->prepare(
                 'INSERT INTO properties
-                 (category,title,title_en,subtitle,subtitle_en,price,price_display,deposit_percent,
+                 (category,title,title_en,subtitle,subtitle_en,price,price_display,price_display_en,deposit_percent,
                   location,location_en,location_short,location_short_en,
-                  land_area,usable_area,floors,beds,bathrooms,parking,offices,
+                  land_area,land_area_en,usable_area,usable_area_en,floors,floors_en,
+                  beds,bathrooms,parking,parking_en,offices,
                   status,status_en,description,description_en,sort_order,is_active)
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->execute($fields);
             $id = (int)db()->lastInsertId();
@@ -100,9 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $stmt = db()->prepare(
                 'UPDATE properties SET
-                 category=?,title=?,title_en=?,subtitle=?,subtitle_en=?,price=?,price_display=?,deposit_percent=?,
+                 category=?,title=?,title_en=?,subtitle=?,subtitle_en=?,price=?,price_display=?,price_display_en=?,deposit_percent=?,
                  location=?,location_en=?,location_short=?,location_short_en=?,
-                 land_area=?,usable_area=?,floors=?,beds=?,bathrooms=?,parking=?,offices=?,
+                 land_area=?,land_area_en=?,usable_area=?,usable_area_en=?,floors=?,floors_en=?,
+                 beds=?,bathrooms=?,parking=?,parking_en=?,offices=?,
                  status=?,status_en=?,description=?,description_en=?,sort_order=?,is_active=?
                  WHERE id=?'
             );
@@ -281,11 +290,20 @@ include('_header.php');
                                id="price-input"
                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
                     </div>
-                    <div>
+                    <!-- TH display price -->
+                    <div class="lang-panel" data-lang="th">
                         <label class="block text-xs font-medium text-gray-600 mb-1">ราคาที่แสดง</label>
                         <input type="text" name="price_display" value="<?= htmlspecialchars($prop['price_display'] ?? '') ?>"
                                placeholder="เช่น 15 ล้านบาท"
                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                    </div>
+                    <!-- EN display price -->
+                    <div class="lang-panel hidden" data-lang="en">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Display Price (EN)</label>
+                        <input type="text" name="price_display_en" value="<?= htmlspecialchars($prop['price_display_en'] ?? '') ?>"
+                               placeholder="e.g. THB 15 Million"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                        <p class="text-xs text-gray-500 mt-1">ถ้าเว้นว่าง หน้าเว็บภาษาอังกฤษจะใช้ราคาที่แสดงภาษาไทย</p>
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">สัดส่วนมัดจำ (%)</label>
@@ -335,25 +353,59 @@ include('_header.php');
         <div class="space-y-5">
             <div class="bg-white rounded-xl border border-gray-200 p-5">
                 <h3 class="font-semibold text-gray-700 text-sm mb-4">ขนาดและรายละเอียด</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <?php
-                    $spec_fields = [
-                        ['land_area',    'ที่ดิน (ตร.ว.)',     'text',   '84 ตร.ว.'],
-                        ['usable_area',  'พื้นที่ใช้สอย',       'text',   '302 ตร.ม.'],
-                        ['floors',       'จำนวนชั้น',           'text',   '2 ชั้น'],
-                        ['beds',         'ห้องนอน / เตียง',    'number', ''],
-                        ['bathrooms',    'ห้องน้ำ',             'number', ''],
-                        ['offices',      'ห้องสำนักงาน',        'number', ''],
-                        ['parking',      'จอดรถ',               'text',   '2 คัน'],
-                    ];
-                    foreach ($spec_fields as [$name, $label, $type, $ph]):
-                    ?>
+                <?php
+                // Text specs carry unit words ("84 ตร.ว.", "2 ชั้น") so each has an EN pair.
+                // Layout: [field, TH label, TH placeholder, EN label, EN placeholder]
+                $spec_text = [
+                    ['land_area',   'ที่ดิน (ตร.ว.)', '84 ตร.ว.',  'Land Area (EN)',   'e.g. 84 sq.wah'],
+                    ['usable_area', 'พื้นที่ใช้สอย',   '302 ตร.ม.', 'Usable Area (EN)', 'e.g. 302 sq.m.'],
+                    ['floors',      'จำนวนชั้น',       '2 ชั้น',    'Floors (EN)',      'e.g. 2 Floors'],
+                    ['parking',     'จอดรถ',           '2 คัน',     'Parking (EN)',     'e.g. 2 Cars'],
+                ];
+                // Counts are language-neutral, so they stay outside the language panels.
+                $spec_num = [
+                    ['beds',      'ห้องนอน / เตียง'],
+                    ['bathrooms', 'ห้องน้ำ'],
+                    ['offices',   'ห้องสำนักงาน'],
+                ];
+                $spec_input_class = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]';
+                ?>
+                <!-- TH specs -->
+                <div class="lang-panel" data-lang="th">
+                    <div class="grid grid-cols-2 gap-3">
+                        <?php foreach ($spec_text as [$name, $label, $ph, , ]): ?>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1"><?= $label ?></label>
+                            <input type="text" name="<?= $name ?>"
+                                   value="<?= htmlspecialchars((string)($prop[$name] ?? '')) ?>"
+                                   placeholder="<?= $ph ?>"
+                                   class="<?= $spec_input_class ?>">
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <!-- EN specs -->
+                <div class="lang-panel hidden" data-lang="en">
+                    <div class="grid grid-cols-2 gap-3">
+                        <?php foreach ($spec_text as [$name, , , $label_en, $ph_en]): ?>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1"><?= $label_en ?></label>
+                            <input type="text" name="<?= $name ?>_en"
+                                   value="<?= htmlspecialchars((string)($prop[$name . '_en'] ?? '')) ?>"
+                                   placeholder="<?= $ph_en ?>"
+                                   class="<?= $spec_input_class ?>">
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">ถ้าเว้นว่าง หน้าเว็บภาษาอังกฤษจะใช้ค่าภาษาไทย</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <?php foreach ($spec_num as [$name, $label]): ?>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1"><?= $label ?></label>
-                        <input type="<?= $type ?>" name="<?= $name ?>"
+                        <input type="number" name="<?= $name ?>"
                                value="<?= htmlspecialchars((string)($prop[$name] ?? '')) ?>"
-                               placeholder="<?= $ph ?>"
-                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
+                               class="<?= $spec_input_class ?>">
                     </div>
                     <?php endforeach; ?>
                 </div>
