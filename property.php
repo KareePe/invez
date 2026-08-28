@@ -169,7 +169,7 @@ $meta_desc  = htmlspecialchars(mb_substr($p['description'] ?? $p['title'], 0, 16
             <div class="flex flex-wrap items-center justify-between gap-4 py-5 border-y border-[#e8e4df] mb-3">
                 <div>
                     <p class="text-xs text-[#9d8f82] mb-0.5"><?= t('ราคา','Price') ?></p>
-                    <p class="text-xl md:text-2xl font-semibold text-[#c9a96e]"><?= htmlspecialchars($p['price_display']) ?></p>
+                    <p class="text-xl md:text-2xl font-semibold text-[#c9a96e]"><?= htmlspecialchars(tf($p, 'price_display')) ?></p>
                 </div>
                 <?php if (!empty($p['status'])): ?>
                 <div class="text-right">
