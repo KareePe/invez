@@ -5,7 +5,7 @@ require_once('../config/db.php');
 $page_title = 'คำสั่งซื้อ';
 
 $filter   = $_GET['status'] ?? 'all';
-$valid    = ['all', 'pending', 'confirmed', 'rejected', 'completed'];
+$valid    = ['all', 'pending', 'confirmed', 'contracted', 'rejected', 'completed'];
 if (!in_array($filter, $valid, true)) $filter = 'all';
 
 $per_page = 20;
@@ -35,18 +35,29 @@ $orders = $stmt->fetchAll();
 $counts = db()->query("SELECT status, COUNT(*) AS cnt FROM property_interests GROUP BY status")->fetchAll(PDO::FETCH_KEY_PAIR);
 
 $status_label = [
-    'pending'   => ['รอยืนยัน',  'bg-amber-100 text-amber-700'],
-    'confirmed' => ['ยืนยันแล้ว', 'bg-green-100 text-green-700'],
-    'rejected'  => ['ไม่อนุมัติ', 'bg-red-100 text-red-700'],
-    'completed' => ['สำเร็จ',     'bg-blue-100 text-blue-700'],
+    'pending'    => ['รอยืนยัน',      'bg-amber-100 text-amber-700'],
+    'confirmed'  => ['ยืนยันแล้ว',     'bg-green-100 text-green-700'],
+    'contracted' => ['เซ็นสัญญาแล้ว', 'bg-indigo-100 text-indigo-700'],
+    'rejected'   => ['ไม่อนุมัติ',     'bg-red-100 text-red-700'],
+    'completed'  => ['สำเร็จ',         'bg-blue-100 text-blue-700'],
 ];
+
+// Orders that are "contracted" get a 90-day deadline counted from the day the
+// status was set. Returns [due date, days remaining] — negative days = overdue.
+function contract_deadline(?string $contracted_at): ?array {
+    if (empty($contracted_at)) return null;
+    $start = date_create(substr($contracted_at, 0, 10));
+    if (!$start) return null;
+    $due = (clone $start)->modify('+90 days');
+    return [$due, (int)date_create('today')->diff($due)->format('%r%a')];
+}
 
 include('_header.php');
 ?>
 
 <div class="flex flex-wrap items-center gap-2 mb-5">
     <?php
-    $tabs = ['all' => 'ทั้งหมด', 'pending' => 'รอยืนยัน', 'confirmed' => 'ยืนยันแล้ว', 'completed' => 'สำเร็จ', 'rejected' => 'ไม่อนุมัติ'];
+    $tabs = ['all' => 'ทั้งหมด', 'pending' => 'รอยืนยัน', 'confirmed' => 'ยืนยันแล้ว', 'contracted' => 'เซ็นสัญญาแล้ว', 'completed' => 'สำเร็จ', 'rejected' => 'ไม่อนุมัติ'];
     foreach ($tabs as $k => $label):
         $cnt = $k === 'all' ? array_sum($counts) : ($counts[$k] ?? 0);
     ?>
@@ -79,6 +90,7 @@ include('_header.php');
             <tbody class="divide-y divide-gray-100">
             <?php foreach ($orders as $o):
                 [$sl, $sc] = $status_label[$o['status']] ?? [$o['status'], 'bg-gray-100 text-gray-600'];
+                $deadline  = $o['status'] === 'contracted' ? contract_deadline($o['contracted_at'] ?? null) : null;
             ?>
             <tr class="hover:bg-gray-50 transition-colors">
                 <td class="px-4 py-3 text-gray-400 font-mono text-[11px] max-w-[140px] truncate" title="<?= htmlspecialchars($o['transaction_id'] ?? '') ?>">
@@ -110,6 +122,14 @@ include('_header.php');
                 </td>
                 <td class="px-4 py-3">
                     <span class="text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap <?= $sc ?>"><?= $sl ?></span>
+                    <?php if ($deadline): [$due, $days_left] = $deadline; ?>
+                    <p class="text-[11px] text-gray-400 mt-1 whitespace-nowrap">
+                        ครบกำหนด <?= $due->format('d/m/Y') ?>
+                    </p>
+                    <p class="text-[11px] font-medium whitespace-nowrap <?= $days_left < 0 ? 'text-red-600' : ($days_left <= 15 ? 'text-amber-600' : 'text-gray-500') ?>">
+                        <?= $days_left < 0 ? 'เกินกำหนด ' . abs($days_left) . ' วัน' : ($days_left === 0 ? 'ครบกำหนดวันนี้' : 'เหลืออีก ' . $days_left . ' วัน') ?>
+                    </p>
+                    <?php endif; ?>
                 </td>
                 <td class="px-4 py-3 text-xs text-gray-400 whitespace-nowrap"><?= date('d/m/Y', strtotime($o['created_at'])) ?></td>
                 <td class="px-4 py-3">

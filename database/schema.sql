@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `properties` (
   `description`    TEXT         DEFAULT NULL,
   `sort_order`     INT          DEFAULT 0,
   `is_active`      TINYINT(1)   DEFAULT 1,
+  `is_contracted`  TINYINT(1)   NOT NULL DEFAULT 0,
   `token`          VARCHAR(32)  UNIQUE DEFAULT NULL,
   `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -78,6 +79,7 @@ CREATE TABLE IF NOT EXISTS `property_interests` (
   `amount_value`   BIGINT           NOT NULL,
   `bank`           VARCHAR(10)      NOT NULL,
   `status`         VARCHAR(20)      NOT NULL DEFAULT 'pending',
+  `contracted_at`  DATETIME         DEFAULT NULL,
   `slip_filename`  VARCHAR(255)     DEFAULT NULL,
   `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

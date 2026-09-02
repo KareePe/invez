@@ -34,6 +34,12 @@ if (!$p) {
 
 $id = (int)$p['id'];
 
+// Contract already signed: no longer open for interest, even via a direct token URL
+if (!empty($p['is_contracted'])) {
+    header('Location: /property/' . $id);
+    exit;
+}
+
 // Cover image
 $img_stmt = db()->prepare("SELECT filename FROM property_images WHERE property_id = ? ORDER BY sort_order ASC LIMIT 1");
 $img_stmt->execute([$id]);

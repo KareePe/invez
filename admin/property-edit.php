@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description_en    = trim($_POST['description_en'] ?? '');
     $sort_order        = (int)($_POST['sort_order'] ?? 0);
     $is_active         = isset($_POST['is_active']) ? 1 : 0;
+    $is_contracted     = isset($_POST['is_contracted']) ? 1 : 0;
 
     if ($title === '')    $errors[] = 'กรุณากรอกชื่อทรัพย์สิน';
     if ($category === '') $errors[] = 'กรุณาเลือกหมวดหมู่';
@@ -88,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $beds, $bathrooms, $parking ?: null, $parking_en ?: null, $offices,
             $status ?: null, $status_en ?: null,
             $description ?: null, $description_en ?: null,
-            $sort_order, $is_active,
+            $sort_order, $is_active, $is_contracted,
         ];
 
         if ($is_new) {
@@ -98,8 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   location,location_en,location_short,location_short_en,
                   land_area,land_area_en,usable_area,usable_area_en,floors,floors_en,
                   beds,bathrooms,parking,parking_en,offices,
-                  status,status_en,description,description_en,sort_order,is_active)
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                  status,status_en,description,description_en,sort_order,is_active,is_contracted)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->execute($fields);
             $id = (int)db()->lastInsertId();
@@ -112,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  location=?,location_en=?,location_short=?,location_short_en=?,
                  land_area=?,land_area_en=?,usable_area=?,usable_area_en=?,floors=?,floors_en=?,
                  beds=?,bathrooms=?,parking=?,parking_en=?,offices=?,
-                 status=?,status_en=?,description=?,description_en=?,sort_order=?,is_active=?
+                 status=?,status_en=?,description=?,description_en=?,sort_order=?,is_active=?,is_contracted=?
                  WHERE id=?'
             );
             $stmt->execute(array_merge($fields, [$id]));
@@ -432,12 +433,20 @@ include('_header.php');
                         <input type="number" name="sort_order" value="<?= (int)($prop['sort_order'] ?? 0) ?>"
                                class="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c9a96e]">
                     </div>
-                    <label class="flex items-center gap-2 text-sm text-gray-700 mt-5 cursor-pointer">
-                        <input type="checkbox" name="is_active" value="1" <?= ($prop['is_active'] ?? 1) ? 'checked' : '' ?>
-                               class="w-4 h-4 rounded accent-[#c9a96e]">
-                        แสดงบนเว็บไซต์
-                    </label>
+                    <div class="mt-5 space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                            <input type="checkbox" name="is_active" value="1" <?= ($prop['is_active'] ?? 1) ? 'checked' : '' ?>
+                                   class="w-4 h-4 rounded accent-[#c9a96e]">
+                            แสดงบนเว็บไซต์
+                        </label>
+                        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                            <input type="checkbox" name="is_contracted" value="1" <?= !empty($prop['is_contracted']) ? 'checked' : '' ?>
+                                   class="w-4 h-4 rounded accent-[#c9a96e]">
+                            เซ็นสัญญาแล้ว
+                        </label>
+                    </div>
                 </div>
+                <p class="text-xs text-gray-500 mt-3">เมื่อติ๊ก &ldquo;เซ็นสัญญาแล้ว&rdquo; หน้ารายละเอียดทรัพย์สินจะแสดงสถานะนี้ และปุ่ม &ldquo;สนใจทรัพย์สินนี้&rdquo; จะถูกปิดการใช้งาน</p>
             </div>
         </div>
     </div>
