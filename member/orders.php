@@ -97,6 +97,7 @@ $orders = $stmt->fetchAll();
 $status_label = [
     'pending'   => [t('รอยืนยัน', 'Pending'),   'bg-amber-100 text-amber-700'],
     'confirmed' => [t('ยืนยันแล้ว', 'Confirmed'), 'bg-green-100 text-green-700'],
+    'contracted' => [t('เซ็นสัญญาแล้ว', 'Contract Signed'), 'bg-indigo-100 text-indigo-700'],
     'rejected'  => [t('ไม่อนุมัติ', 'Rejected'),  'bg-red-100 text-red-700'],
     'completed' => [t('สำเร็จ', 'Completed'),     'bg-blue-100 text-blue-700'],
 ];

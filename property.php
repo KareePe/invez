@@ -171,7 +171,15 @@ $meta_desc  = htmlspecialchars(mb_substr($p['description'] ?? $p['title'], 0, 16
                     <p class="text-xs text-[#9d8f82] mb-0.5"><?= t('ราคา','Price') ?></p>
                     <p class="text-xl md:text-2xl font-semibold text-[#c9a96e]"><?= htmlspecialchars(tf($p, 'price_display')) ?></p>
                 </div>
-                <?php if (!empty($p['status'])): ?>
+                <?php if (!empty($p['is_contracted'])): ?>
+                <div class="text-right">
+                    <p class="text-xs text-[#9d8f82] mb-1"><?= t('สถานะ','Status') ?></p>
+                    <span class="inline-flex items-center gap-1.5 bg-[#1a1714] text-white text-xs font-medium px-3 py-1.5 rounded">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        <?= t('เซ็นสัญญาแล้ว','Contract Signed') ?>
+                    </span>
+                </div>
+                <?php elseif (!empty($p['status'])): ?>
                 <div class="text-right">
                     <p class="text-xs text-[#9d8f82] mb-0.5"><?= t('สถานะ','Status') ?></p>
                     <p class="text-sm font-medium text-[#1a1714]"><?= htmlspecialchars(tf($p, 'status')) ?></p>
@@ -182,11 +190,19 @@ $meta_desc  = htmlspecialchars(mb_substr($p['description'] ?? $p['title'], 0, 16
             <!-- Interest button -->
             <?php if (!empty($p['price'])): ?>
             <div class="mt-4 mb-6">
+                <?php if (!empty($p['is_contracted'])): ?>
+                <button type="button" disabled aria-disabled="true"
+                        class="inline-flex items-center gap-2 bg-[#e8e4df] text-[#9d8f82] px-6 py-2.5 rounded text-sm font-medium cursor-not-allowed">
+                    <?= t('สนใจทรัพย์สินนี้', 'Interested in This Property') ?>
+                </button>
+                <p class="text-xs text-[#9d8f82] mt-2"><?= t('ทรัพย์สินนี้เซ็นสัญญาแล้ว ไม่สามารถแสดงความสนใจได้','This property has been contracted and is no longer available.') ?></p>
+                <?php else: ?>
                 <a href="/checkout/<?= htmlspecialchars($p['token'] ?? '') ?>"
                    class="inline-flex items-center gap-2 bg-[#c9a96e] hover:bg-[#b8965e] text-white px-6 py-2.5 rounded text-sm font-medium transition-colors duration-150">
                     <?= t('สนใจทรัพย์สินนี้', 'Interested in This Property') ?>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </a>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
 
